@@ -1,0 +1,27 @@
+import Nav from "@/components/Nav";
+import Hero from "@/components/Hero";
+import Features from "@/components/Features";
+import DemoVideo from "@/components/DemoVideo";
+import HowItWorks from "@/components/HowItWorks";
+import Pricing from "@/components/Pricing";
+import DownloadCTA from "@/components/DownloadCTA";
+import FAQ from "@/components/FAQ";
+import Footer from "@/components/Footer";
+
+export default function Home() {
+  return (
+    <>
+      <Nav />
+      <main className="flex-1">
+        <Hero />
+        <Features />
+        <DemoVideo />
+        <HowItWorks />
+        <Pricing />
+        <DownloadCTA />
+        <FAQ />
+      </main>
+      <Footer />
+    </>
+  );
+}
