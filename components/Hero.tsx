@@ -1,3 +1,5 @@
+import WaitlistButton from "./WaitlistButton";
+
 const platforms = [
   {
     label: "macOS",
@@ -34,11 +36,11 @@ const platforms = [
 ];
 
 const examples = [
-  { emoji: "📧", text: "find emails about Q3 budget approval" },
-  { emoji: "📁", text: "my contract with Acme Corp" },
-  { emoji: "📄", text: "search invoice PDF for payment due date and terms" },
-  { emoji: "🩺", text: "find medication list in my medical record from Dr. Patel" },
-  { emoji: "💬", text: "find all messages where someone asked about the product launch timeline and pricing in Q4" },
+  { emoji: "🧾", text: "GST invoice from our Bengaluru supplier for the June order" },
+  { emoji: "💡", text: "our office electricity bill from last quarter" },
+  { emoji: "🧾", text: "receipt for the laptop I expensed at Croma" },
+  { emoji: "📑", text: "all client invoices over ₹5 lakh this year" },
+  { emoji: "🚚", text: "the Delhivery courier bill for the Mumbai shipment" },
 ];
 
 export default function Hero() {
@@ -49,18 +51,28 @@ export default function Hero() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-xs font-mono text-[var(--muted)] mb-8">
           <span className="size-1.5 rounded-full bg-[var(--accent)] shadow-[0_0_8px_var(--accent-glow)]" />
-          AI-powered desktop search · 100% local
+          OCR-powered document search · 100% local
         </div>
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] max-w-4xl mx-auto">
-          Chase down any content.{" "}
+          Every document you ever scanned.{" "}
           <span className="bg-gradient-to-r from-[var(--accent)] to-[#e9d5ff] bg-clip-text text-transparent">
-          Even if you forgot where you put it..
+          Searchable easily.
           </span>
           <br className="hidden sm:block" />
-         
         </h1>
+
+        {/* Subheadline */}
+        <p className="mt-6 text-lg text-[var(--muted)] max-w-2xl mx-auto leading-relaxed">
+          The invoice from that vendor. The bill from last winter. The receipt for the thing you returned.
+          Found in under a second, no digging required.
+        </p>
+
+        {/* Waitlist CTA */}
+        <div className="mt-8">
+          <WaitlistButton size="lg" />
+        </div>
 
         {/* Platform pills */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
@@ -84,7 +96,7 @@ export default function Hero() {
             </svg>
             <input
               type="text"
-              placeholder="Describe what you're looking for..."
+              placeholder="Describe the invoice, bill, or receipt you're looking for..."
               aria-label="Search query"
               className="flex-1 min-w-0 bg-transparent text-sm sm:text-base text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none py-2"
             />

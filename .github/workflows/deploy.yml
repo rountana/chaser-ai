@@ -27,6 +27,9 @@ jobs:
       - run: npm run build
         env:
           GITHUB_PAGES: "true"
+          NEXT_PUBLIC_WAITLIST_FORM_ACTION: ${{ secrets.WAITLIST_FORM_ACTION }}
+          NEXT_PUBLIC_WAITLIST_EMAIL_ENTRY: ${{ secrets.WAITLIST_EMAIL_ENTRY }}
+          NEXT_PUBLIC_WAITLIST_PHONE_ENTRY: ${{ secrets.WAITLIST_PHONE_ENTRY }}
       - uses: actions/configure-pages@v5
         with:
           enablement: true

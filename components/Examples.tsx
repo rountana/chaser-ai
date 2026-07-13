@@ -1,14 +1,11 @@
 import CommandPaletteMock from "./CommandPaletteMock";
 
 const examples = [
-  { emoji: "📧", text: "find emails about Q3 budget approval" },
-  { emoji: "📁", text: "my contract with Acme Corp" },
-  { emoji: "📄", text: "search invoice PDF for payment due date and terms" },
-  { emoji: "🩺", text: "find medication list in my medical record from Dr. Patel" },
-  {
-    emoji: "💬",
-    text: "find all messages where someone asked about the product launch timeline and pricing in Q4",
-  },
+  { emoji: "🧾", text: "GST invoice from our Bengaluru supplier for the June order" },
+  { emoji: "💡", text: "our office electricity bill from last quarter" },
+  { emoji: "🧾", text: "receipt for the laptop I expensed at Croma" },
+  { emoji: "📑", text: "all client invoices over ₹5 lakh this year" },
+  { emoji: "🚚", text: "the Delhivery courier bill for the Mumbai shipment" },
 ];
 
 export default function Examples() {
@@ -17,16 +14,16 @@ export default function Examples() {
       <div className="mx-auto max-w-4xl px-6 text-center">
         <h2 className="text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">
           <span className="bg-gradient-to-r from-[var(--accent)] to-[#e9d5ff] bg-clip-text text-transparent">
-            Even if you forgot
+            Found in under
           </span>
           <br />
           <span className="bg-gradient-to-r from-[var(--accent)] to-[#e9d5ff] bg-clip-text text-transparent">
-            where you put it.
+            a second.
           </span>
         </h2>
 
         <p className="mt-6 text-lg text-[var(--muted)] max-w-2xl mx-auto leading-relaxed">
-          chaserAI searches across your emails, documents, Slack, and files — and understands what you actually mean.
+          No digging through folders. chaserAI OCRs and indexes every invoice, bill, and receipt on your device — search by vendor, total, or due date, just like you&apos;d ask a person.
         </p>
 
         {/* Search bar */}
@@ -49,7 +46,7 @@ export default function Examples() {
             </svg>
             <input
               type="text"
-              placeholder="Ask anything or describe what you're looking for..."
+              placeholder="Describe the invoice, bill, or receipt you're looking for..."
               aria-label="Search query"
               className="flex-1 min-w-0 bg-transparent text-sm sm:text-base text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none py-2"
             />

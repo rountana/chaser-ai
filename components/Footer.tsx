@@ -1,5 +1,5 @@
 import Image from "next/image";
-import StoreBadges from "./StoreBadges";
+import WaitlistButton from "./WaitlistButton";
 import { withBasePath } from "@/lib/basePath";
 
 const columns = [
@@ -44,10 +44,10 @@ export default function Footer() {
             style={{ height: 42, width: "auto" }}
           />
           <p className="mt-4 text-sm text-[var(--muted)] max-w-xs leading-relaxed">
-            AI-powered desktop search. Private by default. Built for the way you actually think about your files.
+            OCR-powered document search. Private by default. Built for every invoice, bill, and receipt you&apos;ve ever scanned.
           </p>
           <div className="mt-5">
-            <StoreBadges size="sm" />
+            <WaitlistButton size="sm" variant="outline" />
           </div>
         </div>
 

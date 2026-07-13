@@ -23,27 +23,8 @@ const I = (path: React.ReactNode) => (
 
 const features: Feature[] = [
   {
-    title: "Semantic search",
-    body: "Find files by what they mean, not what they're named. Embeddings let chaserAI match concepts, synonyms, and intent.",
-    icon: I(
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-3.5-3.5" />
-      </>,
-    ),
-  },
-  {
-    title: "Natural-language queries",
-    body: 'Ask like you\'d ask a friend: "the slide deck from the offsite," "tax docs from last year," "that one screenshot."',
-    icon: I(
-      <>
-        <path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
-      </>,
-    ),
-  },
-  {
-    title: "Content-aware indexing",
-    body: "PDFs, docs, code, even text inside screenshots — chaserAI reads inside files, not just filenames.",
+    title: "OCR that reads real receipts",
+    body: "Scanned PDFs, photographed bills, crumpled paper receipts — chaserAI reads the pixels, not just the text layer.",
     icon: I(
       <>
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -53,8 +34,27 @@ const features: Feature[] = [
     ),
   },
   {
+    title: "Ask like a person",
+    body: '"the internet bill that\'s due Friday" — no exact filenames or folders required.',
+    icon: I(
+      <>
+        <path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
+      </>,
+    ),
+  },
+  {
+    title: "Search inside line items",
+    body: "Vendor, total, due date, invoice number — indexed from what's actually written on the page.",
+    icon: I(
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </>,
+    ),
+  },
+  {
     title: "100% local & private",
-    body: "Your index and embeddings live on your Mac. Files never get uploaded, even to us. Air-gap friendly.",
+    body: "Your financial documents never leave your machine. Not even to us. Air-gap friendly.",
     icon: I(
       <>
         <rect x="3" y="11" width="18" height="11" rx="2" />
@@ -64,7 +64,7 @@ const features: Feature[] = [
   },
   {
     title: "Instant results",
-    body: "Sub-100ms search across millions of files. The index updates in the background as you work.",
+    body: "Sub-100ms search, even across years of scanned paperwork. The index updates in the background as you work.",
     icon: I(
       <>
         <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
@@ -93,10 +93,10 @@ export default function Features() {
             Features
           </p>
           <h2 className="mt-3 text-3xl sm:text-5xl font-semibold tracking-tight">
-            Built for the way you actually look for things.
+            Built for the paperwork that piles up.
           </h2>
           <p className="mt-4 text-lg text-[var(--muted)] leading-relaxed">
-            Filename search broke the day you stopped naming files. chaserAI gets you back to "I'll find it" in a second.
+            Scanned PDFs and photographed receipts don&apos;t come with searchable filenames. chaserAI reads what&apos;s actually printed on them.
           </p>
         </div>
 

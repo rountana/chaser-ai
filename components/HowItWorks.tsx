@@ -6,13 +6,13 @@ const steps = [
   },
   {
     n: "02",
-    title: "Local indexer wakes up",
-    body: "chaserAI quietly indexes your files on-device. Embeddings live in a private vector store on your Mac.",
+    title: "chaserAI OCRs your documents",
+    body: "Scanned PDFs, photographed bills, crumpled receipts — chaserAI OCRs and indexes them on-device. Nothing leaves your machine.",
   },
   {
     n: "03",
     title: "⌘ + Space, ask anything",
-    body: "From any app, summon the search bar and type how you'd describe it out loud. Results in under 100ms.",
+    body: "From any app, summon the search bar and ask for the invoice, bill, or receipt you need. Results in under 100ms.",
   },
 ];
 

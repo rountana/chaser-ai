@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { withBasePath } from "@/lib/basePath";
+import WaitlistButton from "./WaitlistButton";
 
 const links = [
   { href: "#features", label: "Features" },
@@ -36,13 +37,7 @@ export default function Nav() {
           ))}
         </ul>
 
-        <a
-          href="#download"
-          className="inline-flex items-center gap-1.5 text-sm text-[var(--foreground)] border border-[var(--border-strong)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors rounded-full px-4 py-1.5"
-        >
-          Get the app
-          <span aria-hidden>↓</span>
-        </a>
+        <WaitlistButton label="Join waitlist" variant="outline" size="sm" />
       </nav>
     </header>
   );
