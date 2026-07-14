@@ -68,15 +68,15 @@ export default function HeroSearch() {
           setActive(null);
           setGlow(false);
           setQuery("");
-          await sleep(450);
+          await sleep(700);
           if (cancelled) return;
 
           for (let k = 1; k <= step.query.length; k++) {
             if (cancelled) return;
             setQuery(step.query.slice(0, k));
-            await sleep(34);
+            await sleep(55);
           }
-          await sleep(1200);
+          await sleep(2200);
           if (cancelled) return;
 
           const top = searchDocs(step.query).results[0]?.doc;
@@ -84,15 +84,15 @@ export default function HeroSearch() {
             setActive(top);
             setHl(step.hl);
             setGlow(false);
-            await sleep(480);
+            await sleep(800);
             if (cancelled) return;
             setGlow(true);
-            await sleep(2600);
+            await sleep(4200);
             if (cancelled) return;
             setGlow(false);
-            await sleep(320);
+            await sleep(700);
           } else {
-            await sleep(900);
+            await sleep(1400);
           }
         }
       }
@@ -104,7 +104,7 @@ export default function HeroSearch() {
   const boxes = active ? highlights[active.file] : undefined;
 
   return (
-    <div className="mt-10 mx-auto max-w-2xl">
+    <div className="mt-10 mx-auto max-w-3xl">
       {/* Query bar (display-only, driven by the demo) */}
       <div className="flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] backdrop-blur-md p-2 pl-5">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted)] shrink-0" aria-hidden>
@@ -122,7 +122,7 @@ export default function HeroSearch() {
       </div>
 
       {/* Stage — swaps between the results list and the opened document */}
-      <div className="mt-4 min-h-[380px]">
+      <div className="mt-4 min-h-[560px]">
         {active && boxes ? (
           // --- Opened document with match highlight ---
           <div className="rounded-2xl border border-[var(--border-strong)] bg-[rgba(20,20,24,0.7)] backdrop-blur-md overflow-hidden text-left shadow-2xl shadow-black/40">
@@ -140,7 +140,7 @@ export default function HeroSearch() {
                 <img
                   src={withBasePath(`/samples/${active.file}`)}
                   alt={active.title}
-                  className="block max-h-[300px] w-auto rounded shadow-lg"
+                  className="block max-h-[480px] w-auto rounded shadow-lg"
                 />
                 {hl.map((field) => {
                   const b = boxes[field];
