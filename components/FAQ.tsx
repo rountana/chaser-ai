@@ -19,10 +19,6 @@ const faqs = [
     q: "Which AI model does it use?",
     a: "Bring your own key and chaserAI runs on your provider of choice — Claude, GPT, or Gemini — for both indexing and search, so your documents only ever touch your account. Prefer not to manage a key? Our managed option handles it for you, encrypted in transit and never stored.",
   },
-  {
-    q: "Can I uninstall and get a refund?",
-    a: "Yes. Drag chaserAI to the Trash and it's gone — index included. We honor App Store and Play Store refund policies, plus a 14-day no-questions-asked refund directly from us.",
-  },
 ];
 
 export default function FAQ() {
