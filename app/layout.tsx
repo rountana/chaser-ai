@@ -16,14 +16,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "chaserAI — Chase down any file. With AI.",
   description:
-    "AI-powered desktop search. Find anything on your Mac in plain English — semantic, content-aware, and 100% local.",
+    "AI-powered desktop search. Find anything on your Mac in plain English — semantic, content-aware, and private by design.",
   icons: {
     icon: withBasePath("/chaser-logo.svg"),
   },
   openGraph: {
     title: "chaserAI — Chase down any file. With AI.",
     description:
-      "AI-powered desktop search. Find anything on your Mac in plain English — semantic, content-aware, and 100% local.",
+      "AI-powered desktop search. Find anything on your Mac in plain English — semantic, content-aware, and private by design.",
     type: "website",
   },
 };

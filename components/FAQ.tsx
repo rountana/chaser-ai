@@ -1,7 +1,7 @@
 const faqs = [
   {
     q: "Does chaserAI send my files to the cloud?",
-    a: "No. The index and embeddings are built and stored on your Mac. You can run chaserAI entirely offline with the built-in local model. Cloud models are opt-in per query and clearly labeled.",
+    a: "To read and index a document, its contents are sent to an AI provider. With bring-your-own-key that's your own account (OpenAI, Anthropic, or Gemini) and nothing passes through us; with our managed option it's encrypted in transit and never stored. Either way, the resulting index and embeddings live on your Mac.",
   },
   {
     q: "Which file types are supported?",
@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: "Which AI model does it use?",
-    a: "By default, an on-device small model handles everything. You can optionally connect a frontier model (Claude, GPT, Gemini) for harder queries — your own API key, your own data path.",
+    a: "Bring your own key and chaserAI runs on your provider of choice — Claude, GPT, or Gemini — for both indexing and search, so your documents only ever touch your account. Prefer not to manage a key? Our managed option handles it for you, encrypted in transit and never stored.",
   },
   {
     q: "Can I uninstall and get a refund?",

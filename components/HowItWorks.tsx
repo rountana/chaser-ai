@@ -7,12 +7,12 @@ const steps = [
   {
     n: "02",
     title: "chaserAI OCRs your documents",
-    body: "Scanned PDFs, photographed bills, crumpled receipts — chaserAI OCRs and indexes them on-device. Nothing leaves your machine.",
+    body: "Scanned PDFs, photographed bills, crumpled receipts — chaserAI extracts and indexes them through your own key, and never stores your documents.",
   },
   {
     n: "03",
     title: "⌘ + Space, ask anything",
-    body: "From any app, summon the search bar and ask for the invoice, bill, or receipt you need. Results in under 100ms.",
+    body: "From any app, summon the search bar and ask for the invoice, bill, or receipt you need.",
   },
 ];
 

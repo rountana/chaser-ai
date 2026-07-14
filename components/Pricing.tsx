@@ -6,7 +6,7 @@ import StoreBadges from "./StoreBadges";
 type Billing = "monthly" | "annual";
 
 type Tier = {
-  id: "free" | "monthly" | "annual" | "lifetime";
+  id: "free" | "byok" | "lifetime" | "managed";
   name: string;
   tagline: string;
   features: string[];
@@ -15,6 +15,7 @@ type Tier = {
   priceAnnualPer?: string;
   flatPrice?: string;
   priceSuffix?: string;
+  priceNote?: string;
   cta?: string;
   highlight?: boolean;
 };
@@ -23,65 +24,65 @@ const tiers: Tier[] = [
   {
     id: "free",
     name: "Free",
-    tagline: "The fastest desktop search you've ever used. Forever.",
+    tagline: "Bring your own key and search your first stack of documents free.",
     flatPrice: "$0",
     priceSuffix: "free forever",
     features: [
-      "Local semantic search",
-      "Natural-language queries (basic model)",
+      "Bring your own API key",
+      "Natural-language document search",
+      "Index up to 2,000 pages",
       "Single device",
-      "Index up to 100k files",
       "Community support",
     ],
   },
   {
-    id: "monthly",
-    name: "Pro · Monthly",
-    tagline: "Unlimited AI search for power users.",
-    priceMonthly: "$9",
-    priceAnnual: "$9",
+    id: "byok",
+    name: "Pro · BYOK",
+    tagline: "Your key, your data. Unlimited indexing, all the power.",
+    priceMonthly: "$6",
+    priceAnnual: "$4",
+    priceAnnualPer: "$48 billed yearly",
     priceSuffix: "per month",
     features: [
       "Everything in Free",
-      "Unlimited AI queries, advanced models",
-      "Content-aware indexing (PDF, OCR, code)",
-      "Up to 3 devices",
-      "Priority email support",
-    ],
-    cta: "Start free trial",
-  },
-  {
-    id: "annual",
-    name: "Pro · Annual",
-    tagline: "Same Pro, billed yearly. Save ~33%.",
-    priceMonthly: "$9",
-    priceAnnual: "$6",
-    priceAnnualPer: "$72 billed yearly",
-    priceSuffix: "per month",
-    features: [
-      "Everything in Pro Monthly",
-      "Save 33% vs. monthly",
+      "Unlimited pages indexed",
+      "Any model — OpenAI, Anthropic, Gemini",
       "Up to 5 devices",
-      "Early access to new features",
-      "Priority email support",
+      "Priority support",
     ],
-    cta: "Start free trial",
+    cta: "Start with your key",
     highlight: true,
   },
   {
     id: "lifetime",
-    name: "Lifetime",
-    tagline: "Pay once. Own forever. Limited launch offer.",
-    flatPrice: "$199",
+    name: "Lifetime · BYOK",
+    tagline: "Pay once. Own forever. Your key covers the AI.",
+    flatPrice: "$149",
     priceSuffix: "one-time",
     features: [
-      "Everything in Pro Annual",
+      "Everything in Pro",
       "All future updates included",
       "Unlimited devices",
       "Founder badge in-app",
       "Lifetime priority support",
     ],
     cta: "Get lifetime access",
+  },
+  {
+    id: "managed",
+    name: "Managed",
+    tagline: "No key, no setup. We run the AI for you.",
+    flatPrice: "$29",
+    priceSuffix: "per month",
+    priceNote: "1,500 pages/mo included · then $12 per 1,000",
+    features: [
+      "No API key needed",
+      "1,500 pages indexed / month",
+      "Fair-use AI search",
+      "Encrypted in transit, never stored",
+      "Priority email support",
+    ],
+    cta: "Start managed",
   },
 ];
 
@@ -103,10 +104,10 @@ export default function Pricing() {
             Pricing
           </p>
           <h2 className="mt-3 text-3xl sm:text-5xl font-semibold tracking-tight">
-            Free to start. Pay only if you love it.
+            Bring your own key. Or let us handle it.
           </h2>
           <p className="mt-4 text-lg text-[var(--muted)] leading-relaxed">
-            14-day free trial on every paid plan. Cancel anytime — your local index stays yours.
+            Plug in your own AI key and pay only for the app — your provider, your rates. Or go managed and we run everything for you, billed by what you index.
           </p>
         </div>
 
@@ -180,6 +181,11 @@ export default function Pricing() {
                     {tier.priceAnnualPer}
                   </p>
                 )}
+                {tier.priceNote && (
+                  <p className="mt-1 text-[11px] font-mono text-[var(--accent)]">
+                    {tier.priceNote}
+                  </p>
+                )}
                 {tier.id === "lifetime" && (
                   <p className="mt-1 text-[11px] font-mono text-[var(--accent)]">
                     Limited launch offer
@@ -235,7 +241,7 @@ export default function Pricing() {
         </ul>
 
         <p className="mt-10 text-center text-sm text-[var(--muted)]">
-          All paid plans include a 14-day free trial. Cancel anytime.
+          BYOK plans only pay for the app — your key covers the AI. Managed is billed monthly with metered indexing. Cancel anytime.
         </p>
       </div>
     </section>

@@ -51,7 +51,7 @@ export default function Hero() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-xs font-mono text-[var(--muted)] mb-8">
           <span className="size-1.5 rounded-full bg-[var(--accent)] shadow-[0_0_8px_var(--accent-glow)]" />
-          OCR-powered document search · 100% local
+          OCR-powered document search · private by design
         </div>
 
         {/* Headline */}

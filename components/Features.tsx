@@ -53,8 +53,8 @@ const features: Feature[] = [
     ),
   },
   {
-    title: "100% local & private",
-    body: "Your financial documents never leave your machine. Not even to us. Air-gap friendly.",
+    title: "Private by design",
+    body: "Bring your own key and your documents go straight to your provider — never through us. On managed, they're encrypted in transit and never stored.",
     icon: I(
       <>
         <rect x="3" y="11" width="18" height="11" rx="2" />
@@ -63,11 +63,12 @@ const features: Feature[] = [
     ),
   },
   {
-    title: "Instant results",
-    body: "Sub-100ms search, even across years of scanned paperwork. The index updates in the background as you work.",
+    title: "Bring your own key",
+    body: "Prefer your own OpenAI, Anthropic, or Gemini account? Drop in your API key and chaserAI runs on it — your provider, your rates, your data.",
     icon: I(
       <>
-        <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
+        <circle cx="7.5" cy="15.5" r="4.5" />
+        <path d="m10.7 12.3 8.3-8.3M15 6l3 3M18 3l3 3" />
       </>,
     ),
   },
