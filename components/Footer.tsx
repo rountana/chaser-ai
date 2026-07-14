@@ -12,20 +12,9 @@ const columns = [
     ],
   },
   {
-    title: "Company",
+    title: "Contact",
     links: [
-      { href: "#", label: "About" },
-      { href: "#", label: "Blog" },
-      { href: "#", label: "Press kit" },
-      { href: "mailto:hello@chaserai.app", label: "Contact" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { href: "#", label: "Privacy" },
-      { href: "#", label: "Terms" },
-      { href: "#", label: "Security" },
+      { href: "mailto:shaam.tx@gmail.com", label: "shaam.tx@gmail.com" },
     ],
   },
 ];
@@ -33,7 +22,7 @@ const columns = [
 export default function Footer() {
   return (
     <footer className="border-t border-[var(--border)] mt-12">
-      <div className="mx-auto max-w-6xl px-6 py-16 grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto max-w-6xl px-6 py-16 grid gap-12 md:grid-cols-[1.6fr_1fr_1fr]">
         <div>
           <Image
             src={withBasePath("/chaser-logo.svg")}
