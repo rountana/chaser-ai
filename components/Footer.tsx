@@ -32,7 +32,7 @@ export default function Footer() {
             style={{ height: 42, width: "auto" }}
           />
           <p className="mt-4 text-sm text-[var(--muted)] max-w-xs leading-relaxed">
-            OCR-powered document search. Private by default. Built for every invoice, bill, and receipt you&apos;ve ever scanned.
+            AI-powered desktop search. Private by default. Built for every invoice, bill, and receipt you&apos;ve ever scanned.
           </p>
           <div className="mt-5">
             <WaitlistButton size="sm" variant="outline" />
