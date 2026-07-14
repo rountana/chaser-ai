@@ -1,7 +1,6 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
-import DemoVideo from "@/components/DemoVideo";
 import HowItWorks from "@/components/HowItWorks";
 import Pricing from "@/components/Pricing";
 import DownloadCTA from "@/components/DownloadCTA";
@@ -15,7 +14,6 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <Features />
-        <DemoVideo />
         <HowItWorks />
         <Pricing />
         <DownloadCTA />

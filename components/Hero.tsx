@@ -56,9 +56,9 @@ export default function Hero() {
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] max-w-4xl mx-auto">
-          Every document you ever scanned.{" "}
+          Describe what you remember.{" "}
           <span className="bg-gradient-to-r from-[var(--accent)] to-[#e9d5ff] bg-clip-text text-transparent">
-          Searchable easily.
+          Find it in scanned documents.
           </span>
           <br className="hidden sm:block" />
         </h1>
@@ -66,7 +66,6 @@ export default function Hero() {
         {/* Subheadline */}
         <p className="mt-6 text-lg text-[var(--muted)] max-w-2xl mx-auto leading-relaxed">
           The invoice from that vendor. The bill from last winter. The receipt for the thing you returned.
-          Found in under a second, no digging required.
         </p>
 
         {/* Waitlist CTA */}
