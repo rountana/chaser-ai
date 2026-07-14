@@ -2,11 +2,11 @@ const steps = [
   {
     n: "01",
     title: "Install in seconds",
-    body: "Download from the App Store or Play Store, sign in, and you're done. No system tweaks, no terminal.",
+    body: "Download the secure app from the website — sign in with Apple or Google, and you're done. No system tweaks, no terminal.",
   },
   {
     n: "02",
-    title: "chaserAI OCRs your documents",
+    title: "Connect to your own AI model of choice",
     body: "Scanned PDFs, photographed bills, crumpled receipts — chaserAI extracts and indexes them through your own key, and never stores your documents.",
   },
   {

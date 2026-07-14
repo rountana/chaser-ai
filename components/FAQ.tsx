@@ -1,15 +1,19 @@
 const faqs = [
   {
     q: "Does chaserAI send my files to the cloud?",
-    a: "To read and index a document, its contents are sent to an AI provider. With bring-your-own-key that's your own account (OpenAI, Anthropic, or Gemini) and nothing passes through us; with our managed option it's encrypted in transit and never stored. Either way, the resulting index and embeddings live on your Mac.",
+    a: "To read and index a document, its contents are sent to an AI model for processing — encrypted in transit and never stored. The resulting search index and embeddings stay on your device.",
+  },
+  {
+    q: "Do I need an internet connection?",
+    a: "Yes — a connection is needed to index new documents and to run searches. Your index stays on your device.",
   },
   {
     q: "Which file types are supported?",
-    a: "PDFs, Word/Pages, Markdown, plain text, source code, and most common image formats (with OCR for text inside screenshots). Audio and video transcription are on the roadmap.",
+    a: "Scanned PDFs, text-based PDFs, and common image formats like JPG and PNG — including photographed and scanned pages, with OCR to read the text inside them.",
   },
   {
     q: "What operating systems work?",
-    a: "macOS 13+ at launch. iOS/iPadOS companion app launches alongside via the App Store. Android and Windows clients are next on the roadmap.",
+    a: "macOS 13+ and Windows 10/11. chaserAI is a desktop-only app — there are no iOS or Android versions.",
   },
   {
     q: "How much disk space does the index need?",
@@ -18,6 +22,10 @@ const faqs = [
   {
     q: "Which AI model does it use?",
     a: "Bring your own key and chaserAI runs on your provider of choice — Claude, GPT, or Gemini — for both indexing and search, so your documents only ever touch your account. Prefer not to manage a key? Our managed option handles it for you, encrypted in transit and never stored.",
+  },
+  {
+    q: "Can I search documents in other languages?",
+    a: "English only for now. Support for the other languages your AI model understands is coming in future releases.",
   },
 ];
 
