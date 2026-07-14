@@ -28,21 +28,29 @@ export default function Hero() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-xs font-mono text-[var(--muted)] mb-8">
           <span className="size-1.5 rounded-full bg-[var(--accent)] shadow-[0_0_8px_var(--accent-glow)]" />
-          OCR-powered document search · private by design
+          AI-powered desktop search · private by design
         </div>
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] max-w-4xl mx-auto">
-          Describe what you remember.{" "}
-          <span className="bg-gradient-to-r from-[var(--accent)] to-[#e9d5ff] bg-clip-text text-transparent">
-          Find it in scanned documents.
-          </span>
-          <br className="hidden sm:block" />
+          Struggle to search through piles of documents?
         </h1>
 
+        {/* Promise */}
+        <p className="mt-7 text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight leading-snug max-w-3xl mx-auto">
+          Describe what you remember,{" "}
+          <span className="bg-gradient-to-r from-[var(--accent)] to-[#e9d5ff] bg-clip-text text-transparent">
+            find it instantly.
+          </span>
+        </p>
+
         {/* Subheadline */}
-        <p className="mt-6 text-lg text-[var(--muted)] max-w-2xl mx-auto leading-relaxed">
-          The invoice from that vendor. The bill from last winter. The receipt for the thing you returned.
+        <p className="mt-5 text-lg sm:text-xl text-[var(--muted)] max-w-2xl mx-auto leading-relaxed">
+          And it works on{" "}
+          <span className="font-medium text-[var(--accent)] bg-[var(--accent-glow)] rounded px-1.5 py-0.5">
+            images and scanned documents
+          </span>
+          .
         </p>
 
         {/* Waitlist CTA */}
