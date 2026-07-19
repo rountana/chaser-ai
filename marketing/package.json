@@ -1,0 +1,12 @@
+{
+  "name": "chaserai-marketing-mockups",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:scenarios": "node mockups/shared/scenarios.test.mjs",
+    "capture": "node scripts/capture.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.47.0"
+  }
+}
