@@ -18,7 +18,7 @@ const expected = JSON.parse(expectedJson);
 const timeoutMs = Number(timeoutArg) || 15000;
 const reducedMotion = motionFlag === "--reduced-motion";
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ["--allow-file-access-from-files"] });
 const page = await browser.newPage({ reducedMotion: reducedMotion ? "reduce" : "no-preference" });
 
 const seen = [];

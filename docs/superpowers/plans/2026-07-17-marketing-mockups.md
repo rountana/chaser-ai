@@ -75,6 +75,8 @@ Expected: `npm install` completes with no errors; `playwright install chromium` 
 
 - [ ] **Step 5: Write `marketing/scripts/assert-selectors.mjs`**
 
+Note: Both test harness scripts launch Chromium with `--allow-file-access-from-files` to permit `<script type="module">` `import` statements over `file://` URLs; without this flag, Chromium blocks module imports with a null-origin CORS error.
+
 ```js
 // marketing/scripts/assert-selectors.mjs
 // Minimal Playwright-based structural smoke check, reused by several plan
@@ -94,7 +96,7 @@ if (!htmlPath || !checksJson) {
 }
 const checks = JSON.parse(checksJson);
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ["--allow-file-access-from-files"] });
 const page = await browser.newPage();
 const pageErrors = [];
 page.on("pageerror", (err) => pageErrors.push(err.message));
@@ -163,7 +165,7 @@ const expected = JSON.parse(expectedJson);
 const timeoutMs = Number(timeoutArg) || 15000;
 const reducedMotion = motionFlag === "--reduced-motion";
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ["--allow-file-access-from-files"] });
 const page = await browser.newPage({ reducedMotion: reducedMotion ? "reduce" : "no-preference" });
 
 const seen = [];
@@ -1195,7 +1197,7 @@ if (!ffmpegAvailable) {
   console.warn("ffmpeg not found on PATH -- video export will stay WebM-only. Install with `brew install ffmpeg` (macOS) for MP4/GIF.");
 }
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ["--allow-file-access-from-files"] });
 for (const target of TARGETS) {
   console.log(`Capturing ${target.name}...`);
   await captureTarget(browser, target, ffmpegAvailable);

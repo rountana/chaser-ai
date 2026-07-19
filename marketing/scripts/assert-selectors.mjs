@@ -16,7 +16,7 @@ if (!htmlPath || !checksJson) {
 }
 const checks = JSON.parse(checksJson);
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ["--allow-file-access-from-files"] });
 const page = await browser.newPage();
 const pageErrors = [];
 page.on("pageerror", (err) => pageErrors.push(err.message));
