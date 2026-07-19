@@ -383,7 +383,7 @@ grep -q "\.mock-card {" marketing/mockups/shared/chaser-mock.css && echo "has .m
 grep -q "\.mock-status-row.grading" marketing/mockups/shared/chaser-mock.css && echo "has grading status"
 ```
 
-Expected: first command prints a count ≥ 10 (one per token line); both `echo` lines print.
+Expected: first command prints `7` (one per `:root` line — several lines pack multiple `--mock-*` tokens together, so this counts lines, not the 19 unique token names); both `echo` lines print.
 
 - [ ] **Step 3: Commit**
 
