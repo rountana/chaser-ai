@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>chaserAI — Results (AI Mode) marketing mockup</title>
+<link rel="stylesheet" href="shared/chaser-mock.css">
+</head>
+<body>
+<div class="stage">
+  <div class="frame">
+    <div class="frame-bar">
+      <span class="frame-dot r"></span><span class="frame-dot y"></span><span class="frame-dot g"></span>
+      <span class="frame-title">chaser · results</span>
+      <span class="frame-mode ai">AI: ON</span>
+    </div>
+    <div class="frame-body">
+      <div class="mock-shell">
+        <div class="mock-sb" id="sidebar"></div>
+        <div>
+          <div class="mock-crumbs">
+            <span id="crumbs-label"></span>
+            <span class="chips"><span class="mock-chip">+ filters</span></span>
+          </div>
+          <div class="mock-sweep-track" id="sweep-track" style="display:none;"><div class="mock-sweep-fill"></div></div>
+          <div class="mock-scan-feed" id="scan-feed" style="display:none;"></div>
+          <div class="mock-status-row" id="status-row"></div>
+          <div id="cards"></div>
+        </div>
+        <div class="mock-preview" id="preview"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { scenarios } from "./shared/scenarios.js";
+
+const sidebarEl = document.getElementById("sidebar");
+const cardsEl = document.getElementById("cards");
+const previewEl = document.getElementById("preview");
+const crumbsEl = document.getElementById("crumbs-label");
+const statusRowEl = document.getElementById("status-row");
+
+function escHtml(s) {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function renderSidebar(scenario) {
+  sidebarEl.innerHTML =
+    "<h5>Type</h5>" +
+    scenario.sidebar.map((b) => `<div class="mock-sb-row"><span>${escHtml(b.label)}</span><b>${b.count}</b></div>`).join("");
+}
+
+function scoreClass(score) {
+  return score < 0.75 ? "mock-score mid" : "mock-score";
+}
+
+function cardHtml(result, { selected = false, justStreamed = false } = {}) {
+  const cls = ["mock-card"];
+  if (selected) cls.push("selected");
+  if (justStreamed) cls.push("just-streamed");
+  return (
+    `<div class="${cls.join(" ")}">` +
+      `<img class="thumb" src="shared/samples/${escHtml(result.filename)}" alt="">` +
+      `<div class="body">` +
+        `<div class="fn"><span>${escHtml(result.filename)}</span>` +
+        `<span class="${scoreClass(result.score)}"><span class="bar"><i style="width:${Math.round(result.score * 100)}%"></i></span>${result.score.toFixed(2)}</span></div>` +
+        `<div class="snip">${escHtml(result.snippet)}</div>` +
+      `</div>` +
+    `</div>`
+  );
+}
+
+function renderCardsComplete(scenario) {
+  cardsEl.innerHTML = scenario.results.map((r) => cardHtml(r, { selected: r.top === true })).join("");
+}
+
+function renderPreview(result) {
+  const rows = [];
+  if (result.type) rows.push(`<dt>Type</dt><dd>${escHtml(result.type)}</dd>`);
+  if (result.date) rows.push(`<dt>Date</dt><dd>${escHtml(result.date)}</dd>`);
+  if (result.keywords && result.keywords.length) rows.push(`<dt>Keys</dt><dd>${escHtml(result.keywords.join(", "))}</dd>`);
+  previewEl.innerHTML =
+    `<img class="hero" src="shared/samples/${escHtml(result.filename)}" alt="">` +
+    `<h6>${escHtml(result.filename)}</h6>` +
+    `<div class="rel">Relevance ${Math.round(result.score * 100)}%</div>` +
+    `<dl>${rows.join("")}</dl>`;
+}
+
+function renderCrumbs(scenario) {
+  crumbsEl.textContent = `top ${scenario.results.length} results`;
+}
+
+function renderComplete(scenario) {
+  statusRowEl.className = "mock-status-row complete";
+  statusRowEl.innerHTML = `<span class="mock-complete-check">✓</span><span>${scenario.results.length} results · ${scenario.elapsedLabel}</span>`;
+}
+
+function renderCompleteFrame(scenario) {
+  renderSidebar(scenario);
+  renderCrumbs(scenario);
+  renderComplete(scenario);
+  renderCardsComplete(scenario);
+  renderPreview(scenario.results.find((r) => r.top) ?? scenario.results[0]);
+}
+
+renderCompleteFrame(scenarios[0]);
+</script>
+</body>
+</html>
