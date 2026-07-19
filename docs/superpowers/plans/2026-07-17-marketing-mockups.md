@@ -82,22 +82,23 @@ Note: Both test harness scripts (and, for the same reason, Task 8's `capture.mjs
 // Minimal Playwright-based structural smoke check, reused by several plan
 // tasks to verify a mockup page renders expected elements/text/styles.
 //
-// Usage: node assert-selectors.mjs <path-to-html> '<JSON array of checks>'
+// Usage: node assert-selectors.mjs <path-to-html> '<JSON array of checks>' [--reduced-motion]
 // Each check: { selector, exists?: true, text?: "exact text", cssProp?: "background-color", cssValue?: "rgb(11, 13, 17)" }
 
 import { chromium } from "playwright";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 
-const [, , htmlPath, checksJson] = process.argv;
+const [, , htmlPath, checksJson, motionFlag] = process.argv;
 if (!htmlPath || !checksJson) {
-  console.error("Usage: node assert-selectors.mjs <html-path> '<checks-json>'");
+  console.error("Usage: node assert-selectors.mjs <html-path> '<checks-json>' [--reduced-motion]");
   process.exit(2);
 }
 const checks = JSON.parse(checksJson);
+const reducedMotion = motionFlag === "--reduced-motion";
 
 const browser = await chromium.launch({ args: ["--allow-file-access-from-files"] });
-const page = await browser.newPage();
+const page = await browser.newPage({ reducedMotion: reducedMotion ? "reduce" : "no-preference" });
 const pageErrors = [];
 page.on("pageerror", (err) => pageErrors.push(err.message));
 
@@ -744,10 +745,10 @@ Expected: `OK — beats fired in order: ["query-typed"]` (well inside the 3s bud
 - [ ] **Step 4: Verify final query text matches the first scenario under reduced motion**
 
 ```bash
-node marketing/scripts/assert-selectors.mjs marketing/mockups/search-ai-mode.html '[{"selector":"#query-text","text":"the FedEx bill for the Austin shipment"}]'
+node marketing/scripts/assert-selectors.mjs marketing/mockups/search-ai-mode.html '[{"selector":"#query-text","text":"the FedEx bill for the Austin shipment"}]' --reduced-motion
 ```
 
-Expected: `OK — 1 check(s) passed`. Note: `assert-selectors.mjs` launches Chromium with default (no-preference) motion, but the check still passes because it runs long after the ~2s typing animation for the first scenario completes.
+Expected: `OK — 1 check(s) passed`. The `--reduced-motion` flag makes the check deterministic: under reduced-motion emulation, the page renders the first scenario's full query text synchronously on load, with no animation delay, so the check runs against the final frame immediately rather than racing the live ~2s typing animation.
 
 - [ ] **Step 5: Commit**
 

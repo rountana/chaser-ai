@@ -2,22 +2,23 @@
 // Minimal Playwright-based structural smoke check, reused by several plan
 // tasks to verify a mockup page renders expected elements/text/styles.
 //
-// Usage: node assert-selectors.mjs <path-to-html> '<JSON array of checks>'
+// Usage: node assert-selectors.mjs <path-to-html> '<JSON array of checks>' [--reduced-motion]
 // Each check: { selector, exists?: true, text?: "exact text", cssProp?: "background-color", cssValue?: "rgb(11, 13, 17)" }
 
 import { chromium } from "playwright";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 
-const [, , htmlPath, checksJson] = process.argv;
+const [, , htmlPath, checksJson, motionFlag] = process.argv;
 if (!htmlPath || !checksJson) {
-  console.error("Usage: node assert-selectors.mjs <html-path> '<checks-json>'");
+  console.error("Usage: node assert-selectors.mjs <html-path> '<checks-json>' [--reduced-motion]");
   process.exit(2);
 }
 const checks = JSON.parse(checksJson);
+const reducedMotion = motionFlag === "--reduced-motion";
 
 const browser = await chromium.launch({ args: ["--allow-file-access-from-files"] });
-const page = await browser.newPage();
+const page = await browser.newPage({ reducedMotion: reducedMotion ? "reduce" : "no-preference" });
 const pageErrors = [];
 page.on("pageerror", (err) => pageErrors.push(err.message));
 
