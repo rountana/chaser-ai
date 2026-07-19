@@ -1065,10 +1065,10 @@ Expected: `OK — beats fired in order: ["query-typed","scanning","verifying","c
 node marketing/scripts/assert-selectors.mjs marketing/mockups/results-ai-mode.html '[
   {"selector":"#status-row.complete","exists":true},
   {"selector":".mock-preview h6","exists":true}
-]'
+]' --reduced-motion
 ```
 
-Expected: `OK — 2 check(s) passed`. (This check runs against a fresh page load with default timing; by the time `assert-selectors.mjs` navigates and queries, roughly 6–8s have elapsed and the first scenario's `complete` state is showing — comfortably inside its 3.5s hold before the next scenario resets the frame. If this becomes flaky in practice, rerun; the underlying beat-order test in Step 2 is the authoritative check.)
+Expected: `OK — 2 check(s) passed`. (`assert-selectors.mjs` has no wait mechanism — it checks the DOM immediately after page load, well before a live multi-second animation would reach its complete state. `--reduced-motion` makes this deterministic instead of racing the animation: under reduced motion, `runLoop()` calls `renderCompleteFrame(scenarios[0])` synchronously, so the complete state — including `statusRowEl.className = "mock-status-row complete"` — is already in place the instant the page loads.)
 
 - [ ] **Step 5: Commit**
 
