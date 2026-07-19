@@ -13,7 +13,7 @@
 - **Location:** everything lives under `marketing/` at the repo root (`chaser-landing-page/marketing/`), a sibling of `India/` (the real Next.js app) — never inside it.
 - **Mode scope:** AI Mode only, for both mockups, this pass. Regular Mode variants are out of scope (fast-follow later, same scaffold).
 - **Visual fidelity:** design tokens and component markup are ported near-verbatim from `~/langchain/docs/specs/2026-07-17-search-results-prd.html` (`--mock-*` custom properties, `.frame*`, `.mock-shell/-card/-preview/-crumbs/-status-row`) and from `~/langchain/chaser/ui/styles.css` (`#sweep-track`, `#scan-feed`, `#grade-phase`, `.search-skeleton`, `.card.just-streamed`, `#search-complete-row`) — dark-only mock surface, coral accent `#ee7a4b`, Inter + JetBrains Mono.
-- **Sample content:** North America flavored (USD amounts, US/Canada vendor names — FedEx, Home Depot, Acme Fabrication, etc.), following the PRD's own naming style. Abstract thumbnail placeholders only — no photorealistic receipt images.
+- **Sample content (revised after Task 3 was originally written):** while this plan was awaiting execution, `main` gained a full North America landing page build (`NorthAmerica/`, sibling to `India/`) with its own fabricated document corpus (`NorthAmerica/lib/sampleDocs.ts`, 25 entries — vendor invoices, utility bills, retail receipts, outgoing client invoices, courier bills) and real generated JPEG thumbnails (`NorthAmerica/public/samples/*.jpg`, ~1.3MB total). The scripted scenarios in Task 3 reuse this real corpus verbatim (same filenames, vendor names, amounts, dates) instead of independently-fabricated data, and the mockups render the real images — copied into `marketing/mockups/shared/samples/` so `marketing/` stays self-contained (no cross-project relative paths) — instead of abstract gray placeholder boxes.
 - **`prefers-reduced-motion: reduce`:** both mockups must render a single static frame (fully typed query / completed results) immediately, with no looping animation, matching `India/components/HeroSearch.tsx`'s existing reduced-motion behavior.
 - **No build step:** both mockup HTML files must open directly in a browser (`file://`) with no bundler or dev server.
 - **Node ESM throughout** — `marketing/package.json` sets `"type": "module"`. No test framework dependency beyond Node's built-in `assert` module and Playwright (already required for the capture script and smoke checks).
@@ -348,6 +348,7 @@ body {
 .mock-card.just-streamed { border-left: 2px solid var(--mock-accent); animation: mock-pop-in 0.35s ease forwards; }
 @keyframes mock-pop-in { from { opacity: 0; } to { opacity: 1; } }
 .mock-card .thumb { width: 30px; height: 30px; border-radius: 6px; background: var(--mock-surface-3); flex-shrink: 0; }
+.mock-card .thumb, .mock-preview .hero { object-fit: cover; display: block; } /* harmless on a div, required once these render <img> tags */
 .mock-card .body { flex: 1; min-width: 0; }
 .mock-card .fn { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; font-weight: 500; margin-bottom: 4px; }
 .mock-card .fn span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -393,17 +394,37 @@ git commit -m "marketing: add shared design tokens and component CSS"
 
 ---
 
-### Task 3: Scripted North-America scenario data
+### Task 3: Scripted North-America scenario data (reusing NorthAmerica's real sample corpus)
+
+`main` gained a full North America landing page build (`NorthAmerica/`) after
+this plan's design phase, complete with a fabricated document corpus
+(`NorthAmerica/lib/sampleDocs.ts`, 25 entries) and real generated JPEG
+thumbnails (`NorthAmerica/public/samples/*.jpg`). Per user decision, these
+scenarios reuse that real corpus verbatim (same filenames, vendor names,
+amounts, dates) instead of independently-fabricated data, and the images are
+copied into `marketing/mockups/shared/samples/` so `marketing/` stays
+self-contained (no relative paths reaching into a sibling project).
 
 **Files:**
+- Copy: `marketing/mockups/shared/samples/*.jpg` (25 files, copied verbatim from `NorthAmerica/public/samples/`)
 - Create: `marketing/mockups/shared/scenarios.test.mjs`
 - Create: `marketing/mockups/shared/scenarios.js`
 
 **Interfaces:**
 - Produces: `export const scenarios` — array of exactly 3 objects, each:
-  `{ id: string, query: string, sidebar: {label:string,count:number}[], scanFeed: {file:string,folder:string}[] (>=6), results: {filename:string,snippet:string,score:number,top?:true,type?:string,date?:string,keywords?:string[]}[] (>=5, sorted by score desc, exactly one top:true which is results[0]), elapsedLabel: string }`. Consumed by Tasks 4–7.
+  `{ id: string, query: string, sidebar: {label:string,count:number}[], scanFeed: {file:string,folder:string}[] (>=6), results: {filename:string,snippet:string,score:number,top?:true,type?:string,date?:string,keywords?:string[]}[] (>=5, sorted by score desc, exactly one top:true which is results[0]), elapsedLabel: string }`. `result.filename` is both the display filename AND the image source — it must exactly match a basename under `marketing/mockups/shared/samples/`. Consumed by Tasks 4–7.
 
-- [ ] **Step 1: Write the failing validation script**
+- [ ] **Step 1: Copy the real sample images**
+
+```bash
+mkdir -p marketing/mockups/shared/samples
+cp NorthAmerica/public/samples/*.jpg marketing/mockups/shared/samples/
+ls marketing/mockups/shared/samples | wc -l
+```
+
+Expected: `25`
+
+- [ ] **Step 2: Write the failing validation script**
 
 ```js
 // marketing/mockups/shared/scenarios.test.mjs
@@ -411,7 +432,12 @@ git commit -m "marketing: add shared design tokens and component CSS"
 // Run: node marketing/mockups/shared/scenarios.test.mjs
 
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { scenarios } from "./scenarios.js";
+
+const SAMPLES_DIR = join(dirname(fileURLToPath(import.meta.url)), "samples");
 
 assert.equal(scenarios.length, 3, "expected exactly 3 scripted scenarios");
 
@@ -432,6 +458,8 @@ for (const s of scenarios) {
   for (const r of s.results) {
     assert.ok(r.filename && r.snippet && typeof r.score === "number", `${s.id}: malformed result ${JSON.stringify(r)}`);
     assert.ok(r.score > 0 && r.score <= 1, `${s.id}: score out of range for ${r.filename}`);
+    assert.ok(r.filename.endsWith(".jpg"), `${s.id}: ${r.filename} must be a .jpg (it doubles as the preview image source)`);
+    assert.ok(existsSync(join(SAMPLES_DIR, r.filename)), `${s.id}: ${r.filename} has no matching file under shared/samples/`);
   }
   assert.ok(Array.isArray(s.sidebar) && s.sidebar.length >= 1, `${s.id}: needs sidebar buckets`);
   assert.ok(typeof s.elapsedLabel === "string", `${s.id}: missing elapsedLabel`);
@@ -440,7 +468,7 @@ for (const s of scenarios) {
 console.log(`OK — ${scenarios.length} scenarios validated`);
 ```
 
-- [ ] **Step 2: Run it and confirm it fails**
+- [ ] **Step 3: Run it and confirm it fails**
 
 ```bash
 node marketing/mockups/shared/scenarios.test.mjs
@@ -448,97 +476,102 @@ node marketing/mockups/shared/scenarios.test.mjs
 
 Expected: FAIL with a module-not-found error for `./scenarios.js`.
 
-- [ ] **Step 3: Write `marketing/mockups/shared/scenarios.js`**
+- [ ] **Step 4: Write `marketing/mockups/shared/scenarios.js`**
+
+Each scenario below reuses real entries from `NorthAmerica/lib/sampleDocs.ts`
+verbatim (filenames, vendor names, amounts, dates) — the `filename` on each
+result is a real image under `shared/samples/` copied in Step 1.
 
 ```js
 // marketing/mockups/shared/scenarios.js
-// Scripted NA-flavored query -> result data for the AI-mode marketing
-// mockups. Each scenario drives both search-ai-mode.html (query typing
-// only) and results-ai-mode.html (full scan -> verify -> complete loop).
+// Scripted query -> result data for the AI-mode marketing mockups, drawn
+// from the real North America document corpus already shipped in
+// NorthAmerica/lib/sampleDocs.ts. Each scenario drives both
+// search-ai-mode.html (query typing only) and results-ai-mode.html (full
+// scan -> verify -> complete loop). `result.filename` doubles as the image
+// source under shared/samples/.
 
 export const scenarios = [
   {
-    id: "fedex-freight",
-    query: "the FedEx invoice for the Q3 freight shipment",
+    id: "fedex-austin",
+    query: "the FedEx bill for the Austin shipment",
     sidebar: [
-      { label: "Financial", count: 3 },
-      { label: "Shipping", count: 2 },
+      { label: "Shipping", count: 5 },
     ],
     scanFeed: [
-      { file: "FedEx_Freight_INV-88213.pdf", folder: "~/Documents/Vendors/FedEx" },
-      { file: "UPS_Ground_Receipt_0417.pdf", folder: "~/Documents/Vendors/UPS" },
-      { file: "Freight_Manifest_Q3.xlsx", folder: "~/Documents/Shipping" },
-      { file: "Customs_Declaration_0912.pdf", folder: "~/Documents/Shipping/Customs" },
-      { file: "Warehouse_Lease_2024.pdf", folder: "~/Documents/Leases" },
-      { file: "DHL_Express_Invoice_331.pdf", folder: "~/Documents/Vendors/DHL" },
-      { file: "Q3_Freight_Summary.pdf", folder: "~/Documents/Shipping" },
-      { file: "Pallet_Order_Confirmation.pdf", folder: "~/Documents/Shipping" },
+      { file: "courier-fedex-austin.jpg", folder: "~/Documents/Shipping/FedEx" },
+      { file: "courier-ups-boston.jpg", folder: "~/Documents/Shipping/UPS" },
+      { file: "vendor-ironclad-hardware-jun.jpg", folder: "~/Documents/Vendors/Ironclad Hardware" },
+      { file: "courier-fedex-denver.jpg", folder: "~/Documents/Shipping/FedEx" },
+      { file: "utility-loop-jun.jpg", folder: "~/Documents/Utilities" },
+      { file: "courier-ups-cleveland.jpg", folder: "~/Documents/Shipping/UPS" },
+      { file: "retail-costco-jun.jpg", folder: "~/Documents/Receipts" },
+      { file: "courier-fedex-sandiego.jpg", folder: "~/Documents/Shipping/FedEx" },
     ],
     results: [
-      { filename: "FedEx_Freight_INV-88213.pdf", snippet: "…Q3 freight shipment, Bill of Lading #4471, remit to FedEx Freight…", score: 0.96, top: true, type: "Invoice", date: "Aug 2024", keywords: ["fedex", "freight", "q3 shipment"] },
-      { filename: "Freight_Manifest_Q3.xlsx", snippet: "…manifest line items, carrier: FedEx Freight, 6 pallets…", score: 0.88, type: "Shipping", date: "Aug 2024", keywords: ["manifest", "freight"] },
-      { filename: "Q3_Freight_Summary.pdf", snippet: "…quarterly freight cost summary, FedEx + DHL combined…", score: 0.81, type: "Shipping", date: "Sep 2024", keywords: [] },
-      { filename: "Customs_Declaration_0912.pdf", snippet: "…customs declaration attached to the Q3 freight invoice…", score: 0.74, type: "Shipping", date: "Aug 2024", keywords: [] },
-      { filename: "DHL_Express_Invoice_331.pdf", snippet: "…unrelated DHL express invoice, mentions freight in passing…", score: 0.62, type: "Invoice", date: "Jul 2024", keywords: [] },
+      { filename: "courier-fedex-austin.jpg", snippet: "…FedEx, tracking 782044109938, Chicago to Austin, ground service…", score: 0.97, top: true, type: "Courier", date: "Jan 22, 2026", keywords: ["fedex", "austin", "ground"] },
+      { filename: "courier-fedex-denver.jpg", snippet: "…FedEx, tracking 782061837765, Chicago to Denver, ground…", score: 0.81, type: "Courier", date: "Mar 18, 2026", keywords: ["fedex", "denver"] },
+      { filename: "courier-fedex-sandiego.jpg", snippet: "…FedEx, tracking 782099204471, Chicago to San Diego, air…", score: 0.76, type: "Courier", date: "May 29, 2026", keywords: ["fedex", "san diego"] },
+      { filename: "courier-ups-boston.jpg", snippet: "…UPS, tracking 1Z9A87W40312445890, Chicago to Boston, air…", score: 0.64, type: "Courier", date: "Feb 7, 2026", keywords: [] },
+      { filename: "courier-ups-cleveland.jpg", snippet: "…UPS, tracking 1Z9A87W40315509934, Chicago to Cleveland, ground…", score: 0.58, type: "Courier", date: "Apr 11, 2026", keywords: [] },
     ],
-    elapsedLabel: "2.1s",
+    elapsedLabel: "1.9s",
   },
   {
     id: "home-depot-renovation",
     query: "the Home Depot receipt for the office renovation",
     sidebar: [
       { label: "Receipts", count: 3 },
-      { label: "Contracts", count: 2 },
+      { label: "Financial", count: 2 },
     ],
     scanFeed: [
-      { file: "HomeDepot_Receipt_04521.jpg", folder: "~/Documents/Receipts/2024" },
-      { file: "Lowes_Receipt_03312.jpg", folder: "~/Documents/Receipts/2024" },
-      { file: "Contractor_Invoice_Renovation.pdf", folder: "~/Documents/Vendors/BuildRight" },
-      { file: "Office_Renovation_Budget.xlsx", folder: "~/Documents/Projects/Renovation" },
-      { file: "Paint_Supplies_Receipt.jpg", folder: "~/Documents/Receipts/2024" },
-      { file: "Electrician_Invoice_0603.pdf", folder: "~/Documents/Vendors" },
-      { file: "Flooring_Estimate.pdf", folder: "~/Documents/Projects/Renovation" },
-      { file: "Permit_Application_Office.pdf", folder: "~/Documents/Projects/Renovation" },
+      { file: "retail-homedepot-may.jpg", folder: "~/Documents/Receipts" },
+      { file: "vendor-summit-furnishings-jun.jpg", folder: "~/Documents/Vendors/Summit Business Furnishings" },
+      { file: "vendor-cascade-office-jun.jpg", folder: "~/Documents/Vendors/Cascade Office Essentials" },
+      { file: "retail-staples-apr.jpg", folder: "~/Documents/Receipts" },
+      { file: "vendor-meridian-print-jun.jpg", folder: "~/Documents/Vendors/Meridian Print & Packaging" },
+      { file: "retail-costco-jun.jpg", folder: "~/Documents/Receipts" },
+      { file: "utility-evanston-jun.jpg", folder: "~/Documents/Utilities" },
+      { file: "retail-bestbuy-mar.jpg", folder: "~/Documents/Receipts" },
     ],
     results: [
-      { filename: "HomeDepot_Receipt_04521.jpg", snippet: "…Home Depot, drywall + paint + fixtures, office renovation…", score: 0.95, top: true, type: "Receipt", date: "Jun 2024", keywords: ["home depot", "renovation", "materials"] },
-      { filename: "Contractor_Invoice_Renovation.pdf", snippet: "…BuildRight Contracting, office renovation phase 2 invoice…", score: 0.9, type: "Invoice", date: "Jun 2024", keywords: ["contractor", "renovation"] },
-      { filename: "Office_Renovation_Budget.xlsx", snippet: "…renovation budget tracker, Home Depot + Lowe's line items…", score: 0.79, type: "Budget", date: "May 2024", keywords: [] },
-      { filename: "Lowes_Receipt_03312.jpg", snippet: "…Lowe's, lumber and hardware, unrelated to office project…", score: 0.71, type: "Receipt", date: "Jun 2024", keywords: [] },
-      { filename: "Paint_Supplies_Receipt.jpg", snippet: "…paint supplies, no vendor named, hand-written total…", score: 0.66, type: "Receipt", date: "Jun 2024", keywords: [] },
+      { filename: "retail-homedepot-may.jpg", snippet: "…The Home Depot, Chicago IL, tools + shelving for the office renovation…", score: 0.95, top: true, type: "Receipt", date: "May 21, 2026", keywords: ["home depot", "renovation", "tools", "shelving"] },
+      { filename: "vendor-summit-furnishings-jun.jpg", snippet: "…Summit Business Furnishings, chairs and desks, office fit-out…", score: 0.83, type: "Invoice", date: "Jun 5, 2025", keywords: ["furniture", "office fit-out"] },
+      { filename: "vendor-cascade-office-jun.jpg", snippet: "…Cascade Office Essentials, paper, toner, markers…", score: 0.71, type: "Invoice", date: "Jun 20, 2025", keywords: [] },
+      { filename: "retail-staples-apr.jpg", snippet: "…Staples, printer and office supplies, unrelated to the renovation…", score: 0.64, type: "Receipt", date: "Apr 9, 2026", keywords: [] },
+      { filename: "retail-costco-jun.jpg", snippet: "…Costco Wholesale, pantry and office supplies, bulk order…", score: 0.57, type: "Receipt", date: "Jun 18, 2026", keywords: [] },
     ],
-    elapsedLabel: "1.8s",
+    elapsedLabel: "2.0s",
   },
   {
-    id: "vendor-invoices-10k",
-    query: "all vendor invoices over $10,000 this year",
+    id: "client-invoices-10k",
+    query: "all outgoing client invoices over $10,000",
     sidebar: [
-      { label: "Invoices", count: 4 },
-      { label: "Contracts", count: 1 },
+      { label: "Financial", count: 5 },
     ],
     scanFeed: [
-      { file: "Acme_Fabrication_INV-2291.pdf", folder: "~/Documents/Vendors/Acme" },
-      { file: "Meridian_Supply_INV-559.pdf", folder: "~/Documents/Vendors/Meridian" },
-      { file: "Northstar_Logistics_INV-102.pdf", folder: "~/Documents/Vendors/Northstar" },
-      { file: "BlueHarbor_Consulting_INV-77.pdf", folder: "~/Documents/Vendors/BlueHarbor" },
-      { file: "Quantvia_Services_INV-410.pdf", folder: "~/Documents/Vendors/Quantvia" },
-      { file: "Everline_Materials_INV-88.pdf", folder: "~/Documents/Vendors/Everline" },
-      { file: "Office_Lease_Renewal.pdf", folder: "~/Documents/Leases" },
-      { file: "Insurance_Policy_2024.pdf", folder: "~/Documents/Insurance" },
+      { file: "client-invoice-cedarstone.jpg", folder: "~/Documents/Clients/Cedar & Stone Law Group" },
+      { file: "client-invoice-pinecrest.jpg", folder: "~/Documents/Clients/Pinecrest Manufacturing" },
+      { file: "client-invoice-brightpath.jpg", folder: "~/Documents/Clients/Bright Path Analytics" },
+      { file: "client-invoice-unionsquare.jpg", folder: "~/Documents/Clients/Union Square Realty" },
+      { file: "client-invoice-delmar.jpg", folder: "~/Documents/Clients/Del Mar Hospitality" },
+      { file: "courier-fedex-denver.jpg", folder: "~/Documents/Shipping/FedEx" },
+      { file: "vendor-crestline-it-jun.jpg", folder: "~/Documents/Vendors/Crestline IT Solutions" },
+      { file: "utility-loop-may.jpg", folder: "~/Documents/Utilities" },
     ],
     results: [
-      { filename: "Northstar_Logistics_INV-102.pdf", snippet: "…Northstar Logistics, total due $22,050.00, net 30…", score: 0.93, top: true, type: "Invoice", date: "Mar 2024", keywords: ["northstar", "logistics", "$22,050"] },
-      { filename: "Acme_Fabrication_INV-2291.pdf", snippet: "…Acme Fabrication, total due $18,240.00, custom parts order…", score: 0.91, type: "Invoice", date: "Feb 2024", keywords: ["acme", "$18,240"] },
-      { filename: "Meridian_Supply_INV-559.pdf", snippet: "…Meridian Supply Co, total due $14,800.00, bulk materials…", score: 0.87, type: "Invoice", date: "Apr 2024", keywords: ["meridian", "$14,800"] },
-      { filename: "BlueHarbor_Consulting_INV-77.pdf", snippet: "…Blue Harbor Consulting, total due $11,300.00, Q1 engagement…", score: 0.79, type: "Invoice", date: "Jan 2024", keywords: ["blue harbor", "$11,300"] },
-      { filename: "Quantvia_Services_INV-410.pdf", snippet: "…Quantvia Services, total due $10,150.00, just over threshold…", score: 0.68, type: "Invoice", date: "May 2024", keywords: ["quantvia", "$10,150"] },
+      { filename: "client-invoice-cedarstone.jpg", snippet: "…Cedar & Stone Law Group, Boston MA, total due $61,500.00, contracts…", score: 0.95, top: true, type: "Invoice", date: "Feb 4, 2026", keywords: ["cedar & stone", "law", "$61,500"] },
+      { filename: "client-invoice-pinecrest.jpg", snippet: "…Pinecrest Manufacturing Co, Cleveland OH, total due $34,200.00…", score: 0.89, type: "Invoice", date: "Apr 15, 2026", keywords: ["pinecrest", "$34,200"] },
+      { filename: "client-invoice-brightpath.jpg", snippet: "…Bright Path Analytics Inc, Austin TX, total due $28,400.00…", score: 0.84, type: "Invoice", date: "Jan 12, 2026", keywords: ["bright path", "$28,400"] },
+      { filename: "client-invoice-unionsquare.jpg", snippet: "…Union Square Realty Partners, Denver CO, total due $19,800.00…", score: 0.77, type: "Invoice", date: "Mar 9, 2026", keywords: ["union square", "$19,800"] },
+      { filename: "client-invoice-delmar.jpg", snippet: "…Del Mar Hospitality Group, San Diego CA, total due $12,650.00…", score: 0.68, type: "Invoice", date: "May 20, 2026", keywords: ["del mar", "$12,650"] },
     ],
-    elapsedLabel: "2.4s",
+    elapsedLabel: "2.3s",
   },
 ];
 ```
 
-- [ ] **Step 4: Run the validation script and confirm it passes**
+- [ ] **Step 5: Run the validation script and confirm it passes**
 
 ```bash
 node marketing/mockups/shared/scenarios.test.mjs
@@ -546,11 +579,11 @@ node marketing/mockups/shared/scenarios.test.mjs
 
 Expected: `OK — 3 scenarios validated`
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit** (images included — they're small, static, and needed for the mockups to render standalone)
 
 ```bash
-git add marketing/mockups/shared/scenarios.js marketing/mockups/shared/scenarios.test.mjs
-git commit -m "marketing: add scripted NA scenario data with validation script"
+git add marketing/mockups/shared/samples marketing/mockups/shared/scenarios.js marketing/mockups/shared/scenarios.test.mjs
+git commit -m "marketing: reuse NorthAmerica's real sample corpus for scripted scenarios"
 ```
 
 ---
@@ -709,7 +742,7 @@ Expected: `OK — beats fired in order: ["query-typed"]` (well inside the 3s bud
 - [ ] **Step 4: Verify final query text matches the first scenario under reduced motion**
 
 ```bash
-node marketing/scripts/assert-selectors.mjs marketing/mockups/search-ai-mode.html '[{"selector":"#query-text","text":"the FedEx invoice for the Q3 freight shipment"}]'
+node marketing/scripts/assert-selectors.mjs marketing/mockups/search-ai-mode.html '[{"selector":"#query-text","text":"the FedEx bill for the Austin shipment"}]'
 ```
 
 Expected: `OK — 1 check(s) passed`. Note: `assert-selectors.mjs` launches Chromium with default (no-preference) motion, but the check still passes because it runs long after the ~2s typing animation for the first scenario completes.
@@ -799,7 +832,7 @@ function cardHtml(result, { selected = false, justStreamed = false } = {}) {
   if (justStreamed) cls.push("just-streamed");
   return (
     `<div class="${cls.join(" ")}">` +
-      `<div class="thumb"></div>` +
+      `<img class="thumb" src="shared/samples/${escHtml(result.filename)}" alt="">` +
       `<div class="body">` +
         `<div class="fn"><span>${escHtml(result.filename)}</span>` +
         `<span class="${scoreClass(result.score)}"><span class="bar"><i style="width:${Math.round(result.score * 100)}%"></i></span>${result.score.toFixed(2)}</span></div>` +
@@ -819,7 +852,7 @@ function renderPreview(result) {
   if (result.date) rows.push(`<dt>Date</dt><dd>${escHtml(result.date)}</dd>`);
   if (result.keywords && result.keywords.length) rows.push(`<dt>Keys</dt><dd>${escHtml(result.keywords.join(", "))}</dd>`);
   previewEl.innerHTML =
-    `<div class="hero"></div>` +
+    `<img class="hero" src="shared/samples/${escHtml(result.filename)}" alt="">` +
     `<h6>${escHtml(result.filename)}</h6>` +
     `<div class="rel">Relevance ${Math.round(result.score * 100)}%</div>` +
     `<dl>${rows.join("")}</dl>`;
@@ -855,13 +888,15 @@ node marketing/scripts/assert-selectors.mjs marketing/mockups/results-ai-mode.ht
   {"selector":".frame-title","text":"chaser · results"},
   {"selector":"#crumbs-label","text":"top 5 results"},
   {"selector":".mock-card","exists":true},
-  {"selector":".mock-card.selected .fn span:first-child","text":"FedEx_Freight_INV-88213.pdf"},
-  {"selector":".mock-preview h6","text":"FedEx_Freight_INV-88213.pdf"},
-  {"selector":"#status-row","text":"✓2.1s"}
+  {"selector":".mock-card.selected .fn span:first-child","text":"courier-fedex-austin.jpg"},
+  {"selector":".mock-preview h6","text":"courier-fedex-austin.jpg"},
+  {"selector":"#status-row","text":"✓1.9s"},
+  {"selector":".mock-card.selected img.thumb","exists":true},
+  {"selector":".mock-preview img.hero","exists":true}
 ]'
 ```
 
-Expected: `OK — 6 check(s) passed`. Note the last check's text has no separators because `textContent` concatenates the check-icon span and the label span with no whitespace between them — this is intentional (matches how `assert-selectors.mjs`'s `.trim()` reads concatenated child text, not a rendering bug: the CSS `gap` on `.mock-status-row` provides the visual spacing).
+Expected: `OK — 8 check(s) passed`. Note the `#status-row` check's text has no separators because `textContent` concatenates the check-icon span and the label span with no whitespace between them — this is intentional (matches how `assert-selectors.mjs`'s `.trim()` reads concatenated child text, not a rendering bug: the CSS `gap` on `.mock-status-row` provides the visual spacing). The `img.thumb`/`img.hero` checks confirm these render as real `<img>` tags (pointing at the copied `shared/samples/` files), not empty placeholder divs.
 
 - [ ] **Step 3: Also confirm the card count matches the scenario**
 
@@ -1223,7 +1258,9 @@ git commit -m "marketing: add Playwright capture script for MP4/GIF/PNG exports"
 Standalone, animated HTML/CSS/JS mockups of the chaserAI search experience,
 built for the landing page, sales/investor presentations, and written
 documents. Kept fully separate from the real product code in `../India/`
-(the Next.js site).
+and `../NorthAmerica/` (the two geography-specific Next.js sites), though
+the scripted scenarios below reuse `NorthAmerica/lib/sampleDocs.ts`'s real
+document corpus and images for consistency with the live NA site.
 
 Scope: **AI Mode only**, for this pass. Regular Mode mockups are a planned
 fast-follow using the same scaffold.
@@ -1240,8 +1277,11 @@ fast-follow using the same scaffold.
   coral-accent (`#ee7a4b`) design tokens and component classes, ported from
   the product PRD and the shipped app's own CSS, so these mockups stay
   visually consistent with both.
-- `mockups/shared/scenarios.js` — the three scripted North-America-flavored
-  query/result scenarios both pages animate through.
+- `mockups/shared/scenarios.js` — the three scripted query/result scenarios
+  both pages animate through, built from real entries in
+  `NorthAmerica/lib/sampleDocs.ts` (same filenames, vendor names, amounts).
+- `mockups/shared/samples/` — the real document thumbnails these scenarios
+  reference, copied from `NorthAmerica/public/samples/`.
 - `scripts/assert-selectors.mjs`, `scripts/wait-for-beats.mjs` — small
   Playwright-based checks used while developing/extending the mockups.
 - `scripts/capture.mjs` — exports both mockups to video (WebM always;
@@ -1290,7 +1330,7 @@ This writes, per mockup, into `marketing/exports/<mockup-name>/`:
 
 | Channel | Use |
 |---|---|
-| Landing page | Embed the HTML mockup directly (iframe, or port the markup/script into a React component under `India/components/` later), or embed the exported MP4 as a looping background video. |
+| Landing page | Embed the HTML mockup directly (iframe, or port the markup/script into a React component under `NorthAmerica/components/` later), or embed the exported MP4 as a looping background video. |
 | Presentations (Keynote/PPT/Slides) | The exported `.mp4` (preferred) or `.gif` — both drop into a slide natively and autoplay/loop without a browser. |
 | Documents (Word/PDF/Google Docs) | The exported PNG keyframes — pick the beat that best matches the point being made (e.g. `verifying.png` when explaining the AI double-check step). |
 
@@ -1321,6 +1361,7 @@ for f in \
   marketing/mockups/shared/chaser-mock.css \
   marketing/mockups/shared/scenarios.js \
   marketing/mockups/shared/scenarios.test.mjs \
+  marketing/mockups/shared/samples/courier-fedex-austin.jpg \
   marketing/scripts/assert-selectors.mjs \
   marketing/scripts/wait-for-beats.mjs \
   marketing/scripts/capture.mjs \
@@ -1356,3 +1397,14 @@ git commit -m "marketing: add README covering preview, capture, and export usage
   Task 6 and reused verbatim (not redefined) in Task 7. The `mock:beat`
   event name and its `detail.beat` values (`query-typed`, `scanning`,
   `verifying`, `complete`) are identical across Tasks 5, 7, and 8.
+- **Revised after user review (post-approval, pre-execution):** `main`
+  gained a full `NorthAmerica/` landing page build with a real fabricated
+  document corpus and generated JPEG thumbnails while this plan was
+  awaiting execution. Task 3 was rewritten to reuse that corpus verbatim
+  (filenames, vendor names, amounts, dates) instead of independently
+  fabricated data, and Tasks 2/6 were updated so cards and the preview
+  panel render the real copied images (`<img class="thumb"/"hero">`)
+  instead of empty gray placeholder divs. All filename/text values used in
+  Tasks 4–7's verification checks were updated to match — see Task 3, the
+  `.mock-card .thumb, .mock-preview .hero` CSS rule in Task 2, and the
+  `cardHtml`/`renderPreview` functions in Task 6.
