@@ -105,7 +105,104 @@ function renderCompleteFrame(scenario) {
   renderPreview(scenario.results.find((r) => r.top) ?? scenario.results[0]);
 }
 
-renderCompleteFrame(scenarios[0]);
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+function beat(name, scenario) {
+  window.dispatchEvent(new CustomEvent("mock:beat", { detail: { beat: name, scenario: scenario.id } }));
+}
+
+async function typeQuery(scenario) {
+  // The results screen has no visible query input in the PRD's illustration,
+  // but this beat keeps the four-beat contract identical to search-ai-mode.html
+  // so capture.mjs can key off the same event names for both pages.
+  await sleep(scenario.query.length * 20);
+  beat("query-typed", scenario);
+}
+
+function resetFrame() {
+  document.getElementById("sweep-track").style.display = "none";
+  const feed = document.getElementById("scan-feed");
+  feed.style.display = "none";
+  feed.innerHTML = "";
+  statusRowEl.innerHTML = "";
+  cardsEl.innerHTML = "";
+  previewEl.innerHTML = "";
+  sidebarEl.innerHTML = "";
+  crumbsEl.textContent = "";
+}
+
+async function runScanning(scenario) {
+  beat("scanning", scenario);
+  const sweep = document.getElementById("sweep-track");
+  const feed = document.getElementById("scan-feed");
+  sweep.style.display = "";
+  feed.style.display = "flex";
+  for (const item of scenario.scanFeed) {
+    const prev = feed.querySelector(".latest");
+    if (prev) prev.classList.remove("latest");
+    const row = document.createElement("div");
+    row.className = "mock-scan-feed-row latest";
+    row.innerHTML =
+      `<span class="mock-scan-feed-dot"></span>` +
+      `<span class="mock-scan-feed-filename">${escHtml(item.file)}</span>` +
+      `<span class="mock-scan-feed-folder">${escHtml(item.folder)}</span>`;
+    feed.appendChild(row);
+    while (feed.children.length > 4) feed.removeChild(feed.firstChild);
+    await sleep(220);
+  }
+  sweep.style.display = "none";
+  feed.style.display = "none";
+}
+
+async function runVerifying(scenario) {
+  beat("verifying", scenario);
+  statusRowEl.className = "mock-status-row grading";
+  statusRowEl.innerHTML = `<span class="spin"></span><span>verifying results…</span>`;
+  renderSidebar(scenario);
+  renderCrumbs(scenario);
+  cardsEl.innerHTML = scenario.results.map(() => `<div class="mock-skel"><div class="ln w90"></div><div class="ln w60"></div></div>`).join("");
+  await sleep(900);
+}
+
+async function runStreaming(scenario) {
+  const skeletons = cardsEl.querySelectorAll(".mock-skel");
+  for (let i = 0; i < scenario.results.length; i++) {
+    const result = scenario.results[i];
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = cardHtml(result, { selected: result.top === true, justStreamed: true });
+    const card = wrapper.firstElementChild;
+    skeletons[i].replaceWith(card);
+    if (result.top) renderPreview(result);
+    await sleep(450);
+  }
+}
+
+async function runScenario(scenario) {
+  resetFrame();
+  await typeQuery(scenario);
+  await runScanning(scenario);
+  await runVerifying(scenario);
+  await runStreaming(scenario);
+  renderComplete(scenario);
+  beat("complete", scenario);
+  await sleep(3500);
+}
+
+async function runLoop() {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) {
+    renderCompleteFrame(scenarios[0]);
+    for (const name of ["query-typed", "scanning", "verifying", "complete"]) beat(name, scenarios[0]);
+    return;
+  }
+  while (true) {
+    for (const scenario of scenarios) {
+      await runScenario(scenario);
+    }
+  }
+}
+
+runLoop();
 </script>
 </body>
 </html>
