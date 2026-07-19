@@ -75,7 +75,7 @@ Expected: `npm install` completes with no errors; `playwright install chromium` 
 
 - [ ] **Step 5: Write `marketing/scripts/assert-selectors.mjs`**
 
-Note: Both test harness scripts launch Chromium with `--allow-file-access-from-files` to permit `<script type="module">` `import` statements over `file://` URLs; without this flag, Chromium blocks module imports with a null-origin CORS error.
+Note: Both test harness scripts (and, for the same reason, Task 8's `capture.mjs`) launch Chromium with `--allow-file-access-from-files` to permit `<script type="module">` `import` statements over `file://` URLs; without this flag, Chromium blocks module imports with a null-origin CORS error.
 
 ```js
 // marketing/scripts/assert-selectors.mjs
