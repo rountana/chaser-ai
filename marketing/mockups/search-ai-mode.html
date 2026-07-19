@@ -31,5 +31,54 @@
     </div>
   </div>
 </div>
+<script type="module">
+import { scenarios } from "./shared/scenarios.js";
+
+const queryEl = document.getElementById("query-text");
+const PLACEHOLDER = "Describe what you're looking for…";
+
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+function setQueryText(text, { placeholder = false, caret = true } = {}) {
+  queryEl.classList.toggle("ph", placeholder);
+  queryEl.textContent = text;
+  if (caret) {
+    const c = document.createElement("span");
+    c.className = "mock-caret";
+    queryEl.appendChild(c);
+  }
+}
+
+function beat(name, scenario) {
+  window.dispatchEvent(new CustomEvent("mock:beat", { detail: { beat: name, scenario: scenario.id } }));
+}
+
+async function typeQuery(scenario) {
+  for (let i = 1; i <= scenario.query.length; i++) {
+    setQueryText(scenario.query.slice(0, i));
+    await sleep(45);
+  }
+  beat("query-typed", scenario);
+}
+
+async function runLoop() {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) {
+    setQueryText(scenarios[0].query, { caret: false });
+    beat("query-typed", scenarios[0]);
+    return;
+  }
+  while (true) {
+    for (const scenario of scenarios) {
+      setQueryText(PLACEHOLDER, { placeholder: true });
+      await sleep(700);
+      await typeQuery(scenario);
+      await sleep(3000);
+    }
+  }
+}
+
+runLoop();
+</script>
 </body>
 </html>
