@@ -893,7 +893,7 @@ node marketing/scripts/assert-selectors.mjs marketing/mockups/results-ai-mode.ht
   {"selector":".mock-card","exists":true},
   {"selector":".mock-card.selected .fn span:first-child","text":"courier-fedex-austin.jpg"},
   {"selector":".mock-preview h6","text":"courier-fedex-austin.jpg"},
-  {"selector":"#status-row","text":"✓1.9s"},
+  {"selector":"#status-row","text":"✓5 results · 1.9s"},
   {"selector":".mock-card.selected img.thumb","exists":true},
   {"selector":".mock-preview img.hero","exists":true}
 ]'
