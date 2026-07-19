@@ -131,7 +131,7 @@ body {
 .mock-skel .ln.w60 { width: 60%; } .mock-skel .ln.w90 { width: 90%; }
 
 .mock-preview { border-left: 1px solid var(--mock-border); padding-left: 16px; }
-.mock-preview .hero { height: 64px; border-radius: 7px; background: var(--mock-surface-3); margin-bottom: 10px; }
+.mock-preview .hero { height: 64px; width: 100%; border-radius: 7px; background: var(--mock-surface-3); margin-bottom: 10px; }
 .mock-preview h6 { font-size: 12px; margin: 0 0 8px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mock-preview dl { margin: 0; font-size: 10.5px; }
 .mock-preview dt { color: var(--mock-text-faint); float: left; width: 44px; clear: left; margin-bottom: 5px; }

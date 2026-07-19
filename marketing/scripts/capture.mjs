@@ -59,6 +59,7 @@ async function captureTarget(browser, target, ffmpegAvailable) {
   });
 
   await page.goto(pathToFileURL(target.html).href);
+  await page.evaluate(() => document.fonts.ready);
 
   const start = Date.now();
   while (seenBeats.length < target.beats.length && Date.now() - start < 20000) {
