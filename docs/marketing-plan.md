@@ -236,7 +236,12 @@ security-reviewed deals — and expect the hardware conversation to be part of e
 machine doing the work."* Then the honest second line about hardware, immediately, in the same
 block. The disclaimer is part of the pitch to this audience, not fine print buried beneath it.
 
-## 5. Recommended beachhead
+## 5. Beachhead — LOCKED
+
+**Decision (2026-07-21): we are building for the Tier-1 beachhead.** Everything on the landing page
+is written for this one reader until we have conversion data.
+
+→ **Landing page content plan: [`docs/landing-page-plan.md`](./landing-page-plan.md)**
 
 Pick **one** Tier-1 segment rather than spreading thin: **North American bookkeepers & small
 accounting/tax practices (CPAs and EAs)**. Reasons:
