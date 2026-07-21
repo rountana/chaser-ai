@@ -21,7 +21,7 @@ const TARGETS = [
   {
     name: "results-ai-mode",
     html: join(ROOT, "mockups", "results-ai-mode.html"),
-    beats: ["query-typed", "scanning", "verifying", "complete"],
+    beats: ["pile", "keyword-typed", "no-results", "query-typed", "scanning", "verifying", "complete"],
     viewport: { width: 960, height: 620 },
   },
 ];

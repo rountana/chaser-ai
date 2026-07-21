@@ -59,6 +59,48 @@ conflated.
    (`chaser-landing-page/marketing/`), sibling to `India/` (the real
    Next.js app), never inside it.
 
+## Addendum — 3-act "before/after" rework (2026-07-21)
+
+The flagship `results-ai-mode.html` was reworked from a single AI-Mode flow
+into a **3-act before/after story**, to dramatize the pain chaserAI removes
+rather than only the "after" magic. The original four beats become Act 3;
+two new acts precede them:
+
+The three acts run on **one shared file set per scenario** — same files, same
+filenames, same search term across before and after — so the only thing that
+changes between Finder and chaserAI is that chaserAI reads the images:
+
+- **Act 1 — the pile** (`pile` beat): a macOS Finder window (a light-theme
+  illustrative recreation, namespaced `.finder-*` in `chaser-mock.css`,
+  stacked over the chaser `.frame` and cross-faded out for Act 3) showing the
+  folder's `files` by their junk camera/scanner `name`s (`IMG_4471.jpg`,
+  `Scan_20260204.pdf`).
+- **Act 2 — the failed hunt** (`keyword-typed`, then `no-results` beats): the
+  scenario's `search` term typed into Finder search → _"No items match your
+  search."_ — scanned images carry no text layer and the junk filenames don't
+  contain the term.
+- **Act 3 — chaserAI**: the `query-typed → scanning → verifying → complete`
+  flow, now **light-themed to match the Finder window** (`.frame.chaser-light`
+  re-maps the `--mock-*` tokens for that subtree; the page stage stays dark).
+  It streams the **same `files` (same junk names)**, answers the **same
+  `search` term** (shown in the crumbs), and ranks `results` whose `name` is
+  the junk filename and `file` is the real sample image. Payoff: the same
+  `IMG_4471.jpg` Finder couldn't find is what chaserAI surfaces once it reads
+  the scan.
+
+Per-scenario data in `scenarios.js`: `search` (the term used in both Finder
+and chaser; `query` is retained as richer natural-language phrasing for
+`search-ai-mode.html` only), `folder { name, path, itemCount }`, `files:
+[{ name, file }]` (the shared pile/scan-feed set), and `results: [{ name,
+file, snippet, score, top, … }]` — every result's `file` is a member of
+`files`, and the top result appears in the pile so the reveal lands. The
+**named beats are now seven** (`pile`, `keyword-typed`, `no-results`,
+`query-typed`, `scanning`, `verifying`, `complete`) — this supersedes the
+"four named beats" in the Deliverables/Verification sections below.
+Reduced-motion still renders one static completed (Act-3) frame and fires all
+seven beats for capture. `search-ai-mode.html` is unchanged (still dark, still
+natural-language `query`). Regular Mode mockups remain a fast follow.
+
 ## Deliverables
 
 ### `marketing/mockups/results-ai-mode.html` (primary)
@@ -119,10 +161,11 @@ A Playwright-based capture script, run manually (`node capture.mjs`), that:
   a looping GIF via `ffmpeg` if available on the machine (documented as an
   optional dependency — script still succeeds with MP4-only if `ffmpeg` is
   missing).
-- Takes 2x-scale PNG screenshots at each named animation beat (query-typed,
-  scanning, verifying, complete) by hooking into the page's own animation
-  state (mockups expose a small `window.__marketingCapture` hook that fires
-  a custom event at each beat, so capture timing isn't guessed via sleeps).
+- Takes 2x-scale PNG screenshots at each named animation beat (see the
+  Addendum for the current seven-beat list; originally query-typed, scanning,
+  verifying, complete) by hooking into the page's own animation state (mockups
+  fire a `mock:beat` custom event at each beat, so capture timing isn't
+  guessed via sleeps).
 - Writes output into `marketing/exports/<mockup-name>/{video,keyframes}/`.
 
 ### `marketing/README.md`
@@ -152,7 +195,8 @@ presentations = MP4/GIF; documents = PNG keyframes).
 - `prefers-reduced-motion` produces a static, non-animated frame on both
   pages.
 - `capture.mjs` run against both pages produces non-empty MP4 output and a
-  PNG for each of the four named beats, without manual timing adjustment.
+  PNG for each named beat (seven for `results-ai-mode` per the Addendum),
+  without manual timing adjustment.
 - Visual spot-check against the PRD's Results/Search illustrations confirms
   matching tokens (coral accent, dark surface, type scale) and component
   shapes.

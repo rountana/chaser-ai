@@ -8,10 +8,43 @@
 </head>
 <body>
 <div class="stage">
-  <div class="frame">
+  <div class="stage-stack">
+  <!-- Acts 1–2: the "before chaserAI" Finder window (the pile + failed keyword search). -->
+  <div class="finder" id="finder">
+    <div class="finder-bar">
+      <span class="finder-dot r"></span><span class="finder-dot y"></span><span class="finder-dot g"></span>
+      <span class="finder-title" id="finder-title">Scans</span>
+      <span class="stage-chip">Before</span>
+      <span class="finder-search" id="finder-search">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+        <span class="finder-search-q ph" id="finder-search-q">Search</span><span class="finder-caret"></span>
+      </span>
+    </div>
+    <div class="finder-body">
+      <div class="finder-sidebar">
+        <div class="finder-sb-group">Favorites</div>
+        <div class="finder-sb-row"><span class="finder-sb-ic"></span>AirDrop</div>
+        <div class="finder-sb-row"><span class="finder-sb-ic"></span>Recents</div>
+        <div class="finder-sb-row"><span class="finder-sb-ic"></span>Desktop</div>
+        <div class="finder-sb-row active"><span class="finder-sb-ic"></span>Documents</div>
+        <div class="finder-sb-row"><span class="finder-sb-ic"></span>Downloads</div>
+      </div>
+      <div class="finder-main">
+        <div class="finder-grid" id="finder-grid"></div>
+        <div class="finder-empty" id="finder-empty">
+          <div class="finder-empty-title">No items match your search.</div>
+          <div class="finder-empty-sub" id="finder-empty-sub"></div>
+        </div>
+        <div class="finder-statusbar" id="finder-status"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Act 3: chaserAI (light theme, matching the Finder window it replaces). -->
+  <div class="frame chaser-light">
     <div class="frame-bar">
       <span class="frame-dot r"></span><span class="frame-dot y"></span><span class="frame-dot g"></span>
       <span class="frame-title">chaser · results</span>
+      <span class="stage-chip">After</span>
       <span class="frame-mode ai">AI: ON</span>
     </div>
     <div class="frame-body">
@@ -31,6 +64,7 @@
       </div>
     </div>
   </div>
+  </div>
 </div>
 
 <script type="module">
@@ -41,6 +75,16 @@ const cardsEl = document.getElementById("cards");
 const previewEl = document.getElementById("preview");
 const crumbsEl = document.getElementById("crumbs-label");
 const statusRowEl = document.getElementById("status-row");
+
+// Acts 1–2: the "before chaserAI" Finder window.
+const finderEl = document.getElementById("finder");
+const finderTitleEl = document.getElementById("finder-title");
+const finderSearchEl = document.getElementById("finder-search");
+const finderSearchQEl = document.getElementById("finder-search-q");
+const finderGridEl = document.getElementById("finder-grid");
+const finderEmptyEl = document.getElementById("finder-empty");
+const finderEmptySubEl = document.getElementById("finder-empty-sub");
+const finderStatusEl = document.getElementById("finder-status");
 
 function escHtml(s) {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -62,9 +106,9 @@ function cardHtml(result, { selected = false, justStreamed = false } = {}) {
   if (justStreamed) cls.push("just-streamed");
   return (
     `<div class="${cls.join(" ")}">` +
-      `<img class="thumb" src="shared/samples/${escHtml(result.filename)}" alt="">` +
+      `<img class="thumb" src="shared/samples/${escHtml(result.file)}" alt="">` +
       `<div class="body">` +
-        `<div class="fn"><span>${escHtml(result.filename)}</span>` +
+        `<div class="fn"><span>${escHtml(result.name)}</span>` +
         `<span class="${scoreClass(result.score)}"><span class="bar"><i style="width:${Math.round(result.score * 100)}%"></i></span>${result.score.toFixed(2)}</span></div>` +
         `<div class="snip">${escHtml(result.snippet)}</div>` +
       `</div>` +
@@ -82,14 +126,16 @@ function renderPreview(result) {
   if (result.date) rows.push(`<dt>Date</dt><dd>${escHtml(result.date)}</dd>`);
   if (result.keywords && result.keywords.length) rows.push(`<dt>Keys</dt><dd>${escHtml(result.keywords.join(", "))}</dd>`);
   previewEl.innerHTML =
-    `<img class="hero" src="shared/samples/${escHtml(result.filename)}" alt="">` +
-    `<h6>${escHtml(result.filename)}</h6>` +
+    `<img class="hero" src="shared/samples/${escHtml(result.file)}" alt="">` +
+    `<h6>${escHtml(result.name)}</h6>` +
     `<div class="rel">Relevance ${Math.round(result.score * 100)}%</div>` +
     `<dl>${rows.join("")}</dl>`;
 }
 
 function renderCrumbs(scenario) {
-  crumbsEl.textContent = `top ${scenario.results.length} results`;
+  // Surface the same search term Finder just failed on, so the "after" is
+  // visibly answering the identical query.
+  crumbsEl.textContent = `“${scenario.search}” · top ${scenario.results.length}`;
 }
 
 function renderComplete(scenario) {
@@ -111,11 +157,61 @@ function beat(name, scenario) {
   window.dispatchEvent(new CustomEvent("mock:beat", { detail: { beat: name, scenario: scenario.id } }));
 }
 
+function finderIconHtml(item) {
+  return (
+    `<div class="finder-item">` +
+      `<div class="finder-item-thumb"><img src="shared/samples/${escHtml(item.file)}" alt=""></div>` +
+      `<div class="finder-item-name">${escHtml(item.name)}</div>` +
+    `</div>`
+  );
+}
+
+// Act 1 — the pile: a Finder folder full of junk-named scans.
+async function renderPile(scenario) {
+  beat("pile", scenario);
+  finderEl.classList.remove("hidden");
+  finderSearchEl.classList.remove("typing");
+  finderSearchQEl.className = "finder-search-q ph";
+  finderSearchQEl.textContent = "Search";
+  finderTitleEl.textContent = scenario.folder.name;
+  finderEmptyEl.style.display = "none";
+  finderGridEl.style.display = "";
+  finderGridEl.innerHTML = scenario.files.map(finderIconHtml).join("");
+  finderStatusEl.textContent = `${scenario.folder.itemCount} items`;
+  await sleep(1600);
+}
+
+// Act 2a — the failed hunt: the search term typed into Finder search.
+async function typeFinderSearch(scenario) {
+  beat("keyword-typed", scenario);
+  const term = scenario.search;
+  finderSearchEl.classList.add("typing");
+  finderSearchQEl.className = "finder-search-q";
+  finderSearchQEl.textContent = "";
+  for (let i = 1; i <= term.length; i++) {
+    finderSearchQEl.textContent = term.slice(0, i);
+    await sleep(95);
+  }
+  await sleep(550);
+}
+
+// Act 2b — nothing matches (scanned images have no text layer), then hand off to chaserAI.
+async function showNoResults(scenario) {
+  beat("no-results", scenario);
+  finderGridEl.style.display = "none";
+  finderEmptyEl.style.display = "flex";
+  finderEmptySubEl.textContent = `“${scenario.search}” isn’t in any filename — and scans have no text to read.`;
+  finderStatusEl.textContent = "0 items";
+  await sleep(1900);
+  finderEl.classList.add("hidden"); // cross-fade out to reveal chaserAI
+  await sleep(450);
+}
+
 async function typeQuery(scenario) {
   // The results screen has no visible query input in the PRD's illustration,
   // but this beat keeps the four-beat contract identical to search-ai-mode.html
   // so capture.mjs can key off the same event names for both pages.
-  await sleep(scenario.query.length * 20);
+  await sleep(scenario.search.length * 20);
   beat("query-typed", scenario);
 }
 
@@ -137,15 +233,15 @@ async function runScanning(scenario) {
   const feed = document.getElementById("scan-feed");
   sweep.style.display = "";
   feed.style.display = "flex";
-  for (const item of scenario.scanFeed) {
+  for (const item of scenario.files) {
     const prev = feed.querySelector(".latest");
     if (prev) prev.classList.remove("latest");
     const row = document.createElement("div");
     row.className = "mock-scan-feed-row latest";
     row.innerHTML =
       `<span class="mock-scan-feed-dot"></span>` +
-      `<span class="mock-scan-feed-filename">${escHtml(item.file)}</span>` +
-      `<span class="mock-scan-feed-folder">${escHtml(item.folder)}</span>`;
+      `<span class="mock-scan-feed-filename">${escHtml(item.name)}</span>` +
+      `<span class="mock-scan-feed-folder">${escHtml(scenario.folder.path)}</span>`;
     feed.appendChild(row);
     while (feed.children.length > 4) feed.removeChild(feed.firstChild);
     await sleep(220);
@@ -179,7 +275,10 @@ async function runStreaming(scenario) {
 
 async function runScenario(scenario) {
   resetFrame();
-  await typeQuery(scenario);
+  await renderPile(scenario);        // Act 1 — the pile
+  await typeFinderSearch(scenario);  // Act 2a — keyword typed
+  await showNoResults(scenario);     // Act 2b — no matches, hand off
+  await typeQuery(scenario);         // Act 3 — chaserAI
   await runScanning(scenario);
   await runVerifying(scenario);
   await runStreaming(scenario);
@@ -191,8 +290,9 @@ async function runScenario(scenario) {
 async function runLoop() {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduced) {
+    finderEl.classList.add("hidden"); // static frame shows the chaserAI "after" state
     renderCompleteFrame(scenarios[0]);
-    for (const name of ["query-typed", "scanning", "verifying", "complete"]) beat(name, scenarios[0]);
+    for (const name of ["pile", "keyword-typed", "no-results", "query-typed", "scanning", "verifying", "complete"]) beat(name, scenarios[0]);
     return;
   }
   while (true) {

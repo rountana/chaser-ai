@@ -82,7 +82,9 @@ body {
 .mock-foot { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--mock-border); font-size: 11px; color: var(--mock-text-faint); font-family: var(--font-mono); }
 
 /* — Results screen — */
-.mock-shell { display: grid; grid-template-columns: 128px 1fr 150px; gap: 16px; }
+/* min-height keeps the frame full-height even when reset/empty, so the Finder
+   overlay (Acts 1–2) fills the same box and the Act-3 cross-fade doesn't jump. */
+.mock-shell { display: grid; grid-template-columns: 128px 1fr 150px; gap: 16px; min-height: 392px; }
 .mock-sb h5 { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--mock-text-faint); margin: 0 0 8px; }
 .mock-sb-row { display: flex; justify-content: space-between; font-size: 11.5px; padding: 4px 0; color: var(--mock-text-muted); }
 .mock-sb-row b { color: var(--mock-text); font-weight: 500; }
@@ -139,3 +141,75 @@ body {
 .mock-preview .rel { font-family: var(--font-mono); font-size: 11px; color: var(--mock-ok); margin: 8px 0; }
 
 .mock-complete-check { width: 14px; height: 14px; border-radius: 50%; background: var(--mock-ok-bg); display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: var(--mock-ok); flex-shrink: 0; }
+
+/* — "Before" screen: a macOS Finder window (Acts 1–2 of results-ai-mode).
+   Light theme, an illustrative recreation used only in the marketing story.
+   Namespaced `finder-` so it never collides with the dark `mock-`/`frame-`
+   classes. Stacked over the chaser `.frame` and cross-faded out for Act 3. */
+.stage-stack { position: relative; width: 100%; max-width: 880px; }
+.stage-stack > .frame { max-width: none; }
+
+.finder {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column;
+  border-radius: 12px; overflow: hidden;
+  background: #ececec; color: #1d1d1f;
+  border: 1px solid rgba(0,0,0,0.18);
+  box-shadow: 0 24px 48px -12px rgba(0,0,0,0.55), 0 4px 8px rgba(0,0,0,0.3);
+  transition: opacity 0.45s ease;
+}
+.finder.hidden { opacity: 0; pointer-events: none; }
+
+.finder-bar { display: flex; align-items: center; gap: 8px; padding: 9px 13px; background: linear-gradient(#e9e9e9, #dcdcdc); border-bottom: 1px solid #c6c6c6; }
+.finder-dot { width: 11px; height: 11px; border-radius: 50%; }
+.finder-dot.r { background: #ff5f57; } .finder-dot.y { background: #febc2e; } .finder-dot.g { background: #28c840; }
+.finder-title { margin-left: 10px; font-size: 12.5px; font-weight: 600; color: #3a3a3c; }
+.finder-search { margin-left: auto; display: flex; align-items: center; gap: 5px; width: 216px; background: #fff; border: 1px solid #c2c2c2; border-radius: 6px; padding: 3px 8px; font-size: 12px; }
+.finder-search svg { flex-shrink: 0; color: #9a9a9f; }
+.finder-search-q { flex: 1; color: #1d1d1f; white-space: nowrap; overflow: hidden; }
+.finder-search-q.ph { color: #9a9a9f; }
+.finder-caret { display: none; width: 1px; height: 13px; background: #1d1d1f; margin-left: 1px; vertical-align: -2px; animation: caret-blink 1s step-end infinite; }
+.finder-search.typing .finder-caret { display: inline-block; }
+
+.finder-body { flex: 1; display: grid; grid-template-columns: 152px 1fr; min-height: 0; }
+.finder-sidebar { background: #e5e5e7; border-right: 1px solid #cfcfd1; padding: 12px 8px; font-size: 12px; color: #4a4a4d; }
+.finder-sb-group { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #9a9a9f; padding: 6px 8px 4px; }
+.finder-sb-row { display: flex; align-items: center; gap: 7px; padding: 4px 8px; border-radius: 6px; }
+.finder-sb-row.active { background: #d2d2d5; }
+.finder-sb-ic { width: 13px; height: 13px; border-radius: 3px; background: #aab6c4; flex-shrink: 0; }
+.finder-sb-row.active .finder-sb-ic { background: #7c90a8; }
+
+.finder-main { display: flex; flex-direction: column; background: #fff; min-height: 0; }
+.finder-grid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; align-content: start; padding: 18px 16px; overflow: hidden; }
+.finder-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.finder-item-thumb { width: 62px; height: 76px; border-radius: 3px; overflow: hidden; background: #f4f4f4; border: 1px solid #dcdcdc; box-shadow: 0 1px 2px rgba(0,0,0,0.12); }
+.finder-item-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.finder-item-name { font-size: 11px; color: #2b2b2d; max-width: 88px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 1px 5px; border-radius: 4px; }
+
+.finder-empty { flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.finder-empty-title { font-size: 16px; font-weight: 600; color: #6b6b6f; }
+.finder-empty-sub { font-size: 12px; color: #9a9a9f; }
+
+.finder-statusbar { border-top: 1px solid #dcdcdc; background: #f2f2f2; padding: 5px 14px; font-size: 11px; color: #7a7a7e; text-align: center; }
+
+/* Narrative "Before" / "After" labels on the two window title bars. Neutral
+   (uses rgba so it reads on either light title bar), deliberately quieter than
+   the functional coral "AI: ON" pill it sits beside. */
+.stage-chip { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: #6f7681; background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.10); border-radius: 999px; padding: 2px 8px; }
+
+/* — chaserAI light theme (Act 3), so the results window matches the light
+   Finder window it replaces. Applied via `.frame.chaser-light` on the results
+   page: it re-maps the `--mock-*` tokens for that subtree, so every `.mock-*`
+   component recolors with no per-component overrides. The page stage stays
+   dark, so the light window still sits on a dark desktop like Finder. */
+.chaser-light {
+  --mock-bg:#ffffff; --mock-surface:#f6f7f9; --mock-surface-2:#eef0f3; --mock-surface-3:#e4e7ec;
+  --mock-border:#e4e7ec; --mock-border-2:#d3d8df;
+  --mock-text:#1d2127; --mock-text-muted:#5b6472; --mock-text-faint:#8b95a3;
+  --mock-accent:#e2673a; --mock-accent-hi:#ee7a4b; --mock-accent-bg:rgba(226,103,58,0.12); --mock-accent-border:rgba(226,103,58,0.30);
+  --mock-ok:#1f9d5f; --mock-ok-bg:rgba(31,157,95,0.13);
+  --mock-warn:#b4881c; --mock-warn-bg:rgba(180,136,28,0.14);
+  --mock-info:#2f6fd0; --mock-info-bg:rgba(47,111,208,0.13);
+}
+/* the dark-on-transparent shimmer is invisible on white — flip it dark */
+.chaser-light .mock-skel::after { background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.045) 50%, transparent 100%); background-size: 200% 100%; }

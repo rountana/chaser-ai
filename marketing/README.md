@@ -14,10 +14,15 @@ fast-follow using the same scaffold.
 
 - `mockups/search-ai-mode.html` — the ⌘K command palette, AI Mode: a typed
   query animates in, cycling through three scripted example queries.
-- `mockups/results-ai-mode.html` — the full results screen: query → scanning
-  (filenames streaming past) → verifying results… (AI judging each
-  candidate) → results streaming in with relevance scores → completed state
-  with the top match open in the preview panel. This is the flagship asset.
+- `mockups/results-ai-mode.html` — the flagship asset, a **3-act
+  before/after story**. Act 1 (_the pile_): a macOS Finder window full of
+  junk-named scans (`IMG_4471.jpg`, `Scan_20260204.pdf`). Act 2 (_the failed
+  hunt_): a keyword typed into Finder search → _"No items match your search."_
+  (scanned images have no text layer). Act 3 (_chaserAI_): cut to the AI-Mode
+  flow — query → scanning (filenames streaming past) → verifying results… (AI
+  judging each candidate) → results streaming in with relevance scores →
+  completed state with the top match open in the preview panel. The payoff:
+  the same image that was `IMG_4471.jpg` in the pile is what chaserAI surfaces.
 - `mockups/shared/chaser-mock.css` — one shared stylesheet with the dark,
   coral-accent (`#ee7a4b`) design tokens and component classes, ported from
   the product PRD and the shipped app's own CSS, so these mockups stay
@@ -65,8 +70,9 @@ npm run capture
 This writes, per mockup, into `marketing/exports/<mockup-name>/`:
 
 - `keyframes/<beat>.png` — one PNG per named animation beat (2x-scale).
-  `search-ai-mode` has one beat (`query-typed`); `results-ai-mode` has four
-  (`query-typed`, `scanning`, `verifying`, `complete`).
+  `search-ai-mode` has one beat (`query-typed`); `results-ai-mode` has seven
+  (`pile`, `keyword-typed`, `no-results`, `query-typed`, `scanning`,
+  `verifying`, `complete`).
 - `video/<mockup-name>.webm` — always produced (Playwright's native format).
 - `video/<mockup-name>.mp4` and `.gif` — produced only if `ffmpeg` was
   installed before running `npm run capture`.
@@ -77,7 +83,7 @@ This writes, per mockup, into `marketing/exports/<mockup-name>/`:
 |---|---|
 | Landing page | Embed the HTML mockup directly (iframe, or port the markup/script into a React component under `NorthAmerica/components/` later), or embed the exported MP4 as a looping background video. |
 | Presentations (Keynote/PPT/Slides) | The exported `.mp4` (preferred) or `.gif` — both drop into a slide natively and autoplay/loop without a browser. |
-| Documents (Word/PDF/Google Docs) | The exported PNG keyframes — pick the beat that best matches the point being made (e.g. `verifying.png` when explaining the AI double-check step). |
+| Documents (Word/PDF/Google Docs) | The exported PNG keyframes — pick the beat that best matches the point being made (e.g. `pile.png` / `no-results.png` for the "before" pain, `verifying.png` when explaining the AI double-check step, `complete.png` for the payoff). |
 
 ## Adding a new scripted scenario
 
@@ -93,5 +99,5 @@ import and loop over the whole array.
 cd marketing
 node mockups/shared/scenarios.test.mjs
 node scripts/assert-selectors.mjs mockups/search-ai-mode.html '[{"selector":".frame-mode.ai","text":"AI: ON"}]'
-node scripts/wait-for-beats.mjs mockups/results-ai-mode.html '["query-typed","scanning","verifying","complete"]' 20000
+node scripts/wait-for-beats.mjs mockups/results-ai-mode.html '["pile","keyword-typed","no-results","query-typed","scanning","verifying","complete"]' 30000
 ```
